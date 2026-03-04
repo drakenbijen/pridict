@@ -53,6 +53,44 @@
   .btn-feedback { background: #e67e22; color: white; font-size: 16px; }
   .btn-navigeer { background: #28a745; color: white; }
 
+  /* Dradenkruis */
+  .crosshair {
+    position: absolute; top: 50%; left: 50%; z-index: 999;
+    transform: translate(-50%, -50%); pointer-events: none;
+  }
+  .crosshair-v {
+    position: absolute; left: 50%; top: -20px; width: 2px; height: 40px;
+    background: rgba(0,0,0,0.5); transform: translateX(-50%);
+  }
+  .crosshair-h {
+    position: absolute; top: 50%; left: -20px; width: 40px; height: 2px;
+    background: rgba(0,0,0,0.5); transform: translateY(-50%);
+  }
+  .crosshair-dot {
+    position: absolute; top: 50%; left: 50%; width: 8px; height: 8px;
+    background: rgba(0,0,0,0.6); border: 2px solid white;
+    border-radius: 50%; transform: translate(-50%, -50%);
+    box-shadow: 0 0 4px rgba(0,0,0,0.3);
+  }
+
+  /* Navigatie-balk onderaan (boven dichtstbij-bar) */
+  .nav-bar {
+    position: absolute; bottom: 50px; left: 10px; right: 10px; z-index: 998;
+    background: rgba(255,255,255,0.95); padding: 8px 12px;
+    border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 13px; backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+  .nav-bar-coords { flex: 1; color: #2c3e50; font-weight: 500; }
+  .nav-bar-btn {
+    background: #28a745; color: white; border: none;
+    padding: 10px 18px; border-radius: 20px; font-size: 14px;
+    cursor: pointer; font-weight: 600; white-space: nowrap;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .nav-bar-btn:active { transform: scale(0.95); }
+
   /* Feedback paneel */
   .feedback-panel {
     position: fixed; bottom: 0; left: 0; right: 0; z-index: 2001;
@@ -223,6 +261,19 @@
 <!-- Kaart -->
 <div id="map"></div>
 
+<!-- Dradenkruis (altijd zichtbaar in het midden) -->
+<div class="crosshair" id="crosshair">
+  <div class="crosshair-v"></div>
+  <div class="crosshair-h"></div>
+  <div class="crosshair-dot"></div>
+</div>
+
+<!-- Navigatiebalk met coördinaten van het midden -->
+<div class="nav-bar" id="navBar">
+  <div class="nav-bar-coords" id="navCoords">Verschuif kaart naar doel</div>
+  <button class="nav-bar-btn" onclick="navigeerNaarMidden()">Navigeer &#10148;</button>
+</div>
+
 <!-- Info panel -->
 <div class="info-panel" id="infoPanel">
   <h3>Pridict — Veldkaart</h3>
@@ -253,7 +304,6 @@
   <button class="veld-btn btn-feedback" id="btnFeedback" onclick="openFeedback()">+</button>
   <button class="veld-btn btn-info" id="btnInfo" onclick="toggleInfo()">i</button>
   <button class="veld-btn btn-gps" id="btnGps" onclick="centerOpGebruiker()">&#9737;</button>
-  <button class="veld-btn btn-navigeer" id="btnNav" onclick="navigeerDichtsbij()" style="display:none">&#10148;</button>
 </div>
 
 <!-- Feedback overlay + paneel -->
@@ -1094,27 +1144,10 @@ function startGPS() {
   );
 }
 
-// Klik op kaart: navigatie-popup + feedback-locatie opslaan
+// Klik op kaart: sluit eventuele popups, update feedback-locatie
 map.on('click', function(e) {
   feedbackLat = e.latlng.lat;
   feedbackLon = e.latlng.lng;
-
-  var lat = e.latlng.lat.toFixed(6);
-  var lon = e.latlng.lng.toFixed(6);
-  var navUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lon + '&travelmode=driving';
-
-  var content = '<b>Locatie</b><br>' + e.latlng.lat.toFixed(5) + ', ' + e.latlng.lng.toFixed(5);
-  if (userLat !== null) {
-    var d = haversine(userLat, userLon, e.latlng.lat, e.latlng.lng);
-    content += '<br>Afstand: ' + (d < 1000 ? Math.round(d) + 'm' : (d/1000).toFixed(1) + 'km');
-  }
-  content += '<br><a href="' + navUrl + '" target="_blank" ' +
-    'style="display:inline-block;margin-top:6px;padding:8px 16px;' +
-    'background:#28a745;color:white;border-radius:20px;text-decoration:none;' +
-    'font-weight:600">Navigeer hierheen &#10148;</a>';
-
-  L.popup().setLatLng(e.latlng).setContent(content).openOn(map);
-
   if (!gpsActief) {
     handmatigeModus = true;
     setUserPosition(e.latlng.lat, e.latlng.lng, null, 'handmatig');
@@ -1135,6 +1168,33 @@ function centerOpGebruiker() {
 // Stop volgen als gebruiker zelf pant
 map.on('movestart', function() { volgGebruiker = false; });
 
+// === Dradenkruis: toon coördinaten van kaartcentrum ===
+function updateNavBar() {
+  var c = map.getCenter();
+  var navCoords = document.getElementById('navCoords');
+  var tekst = c.lat.toFixed(5) + ', ' + c.lng.toFixed(5);
+  if (userLat !== null) {
+    var d = haversine(userLat, userLon, c.lat, c.lng);
+    tekst += ' (' + (d < 1000 ? Math.round(d) + 'm' : (d/1000).toFixed(1) + 'km') + ')';
+  }
+  navCoords.textContent = tekst;
+  // Sla op voor feedback
+  feedbackLat = c.lat;
+  feedbackLon = c.lng;
+}
+
+map.on('move', updateNavBar);
+map.on('moveend', updateNavBar);
+
+function navigeerNaarMidden() {
+  var c = map.getCenter();
+  window.open(
+    'https://www.google.com/maps/dir/?api=1&destination=' +
+    c.lat.toFixed(6) + ',' + c.lng.toFixed(6) + '&travelmode=driving',
+    '_blank'
+  );
+}
+
 function updateDichtstbij() {
   if (userLat === null) return;
 
@@ -1153,7 +1213,6 @@ function updateDichtstbij() {
   var bar = document.getElementById('dichtstbijBar');
   var info = document.getElementById('dichtstbijInfo');
   var afstand = document.getElementById('gpsAfstand');
-  var btnNav = document.getElementById('btnNav');
 
   if (minV && minDist < 5000) {
     var afstTekst = minDist < 1000
@@ -1163,11 +1222,9 @@ function updateDichtstbij() {
                      ' (score: ' + minV.score.toFixed(2) + ')';
     afstand.textContent = 'Dichtstbij: ' + afstTekst;
     bar.className = 'dichtstbij-bar active';
-    btnNav.style.display = 'flex';
   } else {
     bar.className = 'dichtstbij-bar';
     afstand.textContent = '';
-    btnNav.style.display = 'none';
   }
 }
 
