@@ -419,10 +419,26 @@ var map = L.map('map', {zoomControl: false}).setView([51.2560389387028, 6.046000
 
 L.control.zoom({position: 'bottomleft'}).addTo(map);
 
-L.tileLayer('https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:3857/{z}/{x}/{y}.png', {
+// Kaarttegels met fallback naar OpenStreetMap als PDOK niet laadt
+var pdokTiles = L.tileLayer('https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:3857/{z}/{x}/{y}.png', {
   maxNativeZoom: 18, maxZoom: 21,
   attribution: 'Kaartgegevens: Kadaster'
-}).addTo(map);
+});
+var osmTiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+  attribution: '&copy; OpenStreetMap'
+});
+pdokTiles.addTo(map);
+// Als PDOK-tegels niet laden, schakel over naar OSM
+var pdokGeladen = false;
+pdokTiles.on('tileload', function() { pdokGeladen = true; });
+setTimeout(function() {
+  if (!pdokGeladen) {
+    map.removeLayer(pdokTiles);
+    osmTiles.addTo(map);
+    console.log('PDOK tegels niet beschikbaar, fallback naar OSM');
+  }
+}, 5000);
 
 var bekendeLayer = L.layerGroup().addTo(map);
 var voorspelLayer = L.layerGroup().addTo(map);
