@@ -272,6 +272,13 @@ window.onerror = function(msg, url, line) {
     <div class="legenda-kleur" style="background:#f9e51c; border-color:#f1c40f;"></div>
     Mogelijk
   </div>
+  <hr style="margin:6px 0;border-color:#ddd">
+  <div style="font-weight:600;font-size:12px;margin-bottom:4px">Veldwaarnemingen (19)</div>
+  <div class="legenda-item"><div class="legenda-kleur" style="background:#2980b9;border-color:#2980b9;border-radius:50%"></div>Wissel/pad (7)</div>
+  <div class="legenda-item"><div class="legenda-kleur" style="background:#8B4513;border-color:#8B4513;border-radius:50%"></div>Graafspoor (5)</div>
+  <div class="legenda-item"><div class="legenda-kleur" style="background:#8e44ad;border-color:#8e44ad;border-radius:50%"></div>Haar (1)</div>
+  <div class="legenda-item"><div class="legenda-kleur" style="background:#95a5a6;border-color:#95a5a6;border-radius:50%"></div>Molshopen (3)</div>
+  <div class="legenda-item"><div class="legenda-kleur" style="background:#e74c3c;border-color:#e74c3c;border-radius:50%"></div>Leeg (2)</div>
   <div class="stats">
     Locaties: 100 | Raster: 75m
   </div>
@@ -394,6 +401,7 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 var bekendeLayer = L.layerGroup().addTo(map);
 var voorspelLayer = L.layerGroup().addTo(map);
+var veldLayer = L.layerGroup().addTo(map);
 var voorspelMarkers = [];
 
 // Bekende burchten (array voor afstandsberekening)
@@ -1641,11 +1649,108 @@ var BEKENDE_BURCHTEN = [[51.2498819, 6.022837], [51.255114, 6.02762], [51.256943
         })();
         
 
+// Veldwaarnemingen
+
+        L.circleMarker([51.271614, 6.038883], {
+            radius: 7, color: '#e74c3c', fillColor: '#e74c3c',
+            fillOpacity: 0.85, weight: 2
+        }).addTo(veldLayer).bindPopup('<b>Leeg</b><br>51.27161, 6.03888<br>Datum: 2026-03-05');
+        
+        L.circleMarker([51.272288, 6.038883], {
+            radius: 7, color: '#e74c3c', fillColor: '#e74c3c',
+            fillOpacity: 0.85, weight: 2
+        }).addTo(veldLayer).bindPopup('<b>Leeg</b><br>51.27229, 6.03888<br>Datum: 2026-03-05');
+        
+        L.circleMarker([51.273068, 6.039457], {
+            radius: 7, color: '#8e44ad', fillColor: '#8e44ad',
+            fillOpacity: 0.85, weight: 2
+        }).addTo(veldLayer).bindPopup('<b>Haar</b><br>51.27307, 6.03946<br>Datum: 2026-03-05');
+        
+        L.circleMarker([51.268386, 6.030925], {
+            radius: 7, color: '#2980b9', fillColor: '#2980b9',
+            fillOpacity: 0.85, weight: 2
+        }).addTo(veldLayer).bindPopup('<b>Wissel/pad</b><br>51.26839, 6.03092<br>Datum: 2026-03-05');
+        
+        L.circleMarker([51.267853, 6.029356], {
+            radius: 7, color: '#2980b9', fillColor: '#2980b9',
+            fillOpacity: 0.85, weight: 2
+        }).addTo(veldLayer).bindPopup('<b>Wissel/pad</b><br>51.26785, 6.02936<br>Datum: 2026-03-05');
+        
+        L.circleMarker([51.267619, 6.029503], {
+            radius: 7, color: '#95a5a6', fillColor: '#95a5a6',
+            fillOpacity: 0.85, weight: 2
+        }).addTo(veldLayer).bindPopup('<b>Molshopen</b><br>51.26762, 6.02950<br>Datum: 2026-03-05');
+        
+        L.circleMarker([51.266578, 6.028292], {
+            radius: 7, color: '#95a5a6', fillColor: '#95a5a6',
+            fillOpacity: 0.85, weight: 2
+        }).addTo(veldLayer).bindPopup('<b>Molshopen</b><br>51.26658, 6.02829<br>Datum: 2026-03-05');
+        
+        L.circleMarker([51.266212, 6.027531], {
+            radius: 7, color: '#2980b9', fillColor: '#2980b9',
+            fillOpacity: 0.85, weight: 2
+        }).addTo(veldLayer).bindPopup('<b>Wissel/pad</b><br>51.26621, 6.02753<br>Datum: 2026-03-05');
+        
+        L.circleMarker([51.265551, 6.025963], {
+            radius: 7, color: '#8B4513', fillColor: '#8B4513',
+            fillOpacity: 0.85, weight: 2
+        }).addTo(veldLayer).bindPopup('<b>Graafspoor</b><br>51.26555, 6.02596<br>Datum: 2026-03-05');
+        
+        L.circleMarker([51.264877, 6.025963], {
+            radius: 7, color: '#8B4513', fillColor: '#8B4513',
+            fillOpacity: 0.85, weight: 2
+        }).addTo(veldLayer).bindPopup('<b>Graafspoor</b><br>51.26488, 6.02596<br>Datum: 2026-03-05');
+        
+        L.circleMarker([51.264731, 6.026056], {
+            radius: 7, color: '#8B4513', fillColor: '#8B4513',
+            fillOpacity: 0.85, weight: 2
+        }).addTo(veldLayer).bindPopup('<b>Graafspoor</b><br>51.26473, 6.02606<br>Datum: 2026-03-05');
+        
+        L.circleMarker([51.264877, 6.024886], {
+            radius: 7, color: '#8B4513', fillColor: '#8B4513',
+            fillOpacity: 0.85, weight: 2
+        }).addTo(veldLayer).bindPopup('<b>Graafspoor</b><br>51.26488, 6.02489<br>Datum: 2026-03-05');
+        
+        L.circleMarker([51.264203, 6.023809], {
+            radius: 7, color: '#8B4513', fillColor: '#8B4513',
+            fillOpacity: 0.85, weight: 2
+        }).addTo(veldLayer).bindPopup('<b>Graafspoor</b><br>51.26420, 6.02381<br>Datum: 2026-03-05');
+        
+        L.circleMarker([51.264877, 6.023809], {
+            radius: 7, color: '#2980b9', fillColor: '#2980b9',
+            fillOpacity: 0.85, weight: 2
+        }).addTo(veldLayer).bindPopup('<b>Wissel/pad</b><br>51.26488, 6.02381<br>Datum: 2026-03-05');
+        
+        L.circleMarker([51.264877, 6.022733], {
+            radius: 7, color: '#2980b9', fillColor: '#2980b9',
+            fillOpacity: 0.85, weight: 2
+        }).addTo(veldLayer).bindPopup('<b>Wissel/pad</b><br>51.26488, 6.02273<br>Datum: 2026-03-05');
+        
+        L.circleMarker([51.265114, 6.025623], {
+            radius: 7, color: '#2980b9', fillColor: '#2980b9',
+            fillOpacity: 0.85, weight: 2
+        }).addTo(veldLayer).bindPopup('<b>Wissel/pad</b><br>51.26511, 6.02562<br>Datum: 2026-03-05');
+        
+        L.circleMarker([51.265081, 6.024452], {
+            radius: 7, color: '#2980b9', fillColor: '#2980b9',
+            fillOpacity: 0.85, weight: 2
+        }).addTo(veldLayer).bindPopup('<b>Wissel/pad</b><br>51.26508, 6.02445<br>Datum: 2026-03-05');
+        
+        L.circleMarker([51.265597, 6.026908], {
+            radius: 7, color: '#95a5a6', fillColor: '#95a5a6',
+            fillOpacity: 0.85, weight: 2
+        }).addTo(veldLayer).bindPopup('<b>Molshopen</b><br>51.26560, 6.02691<br>Datum: 2026-03-05');
+        
+
 // Layer control
-L.control.layers(null, {
+var overlays = {
   'Bekende burchten': bekendeLayer,
   'Voorspellingen': voorspelLayer
-}, {collapsed: true, position: 'topleft'}).addTo(map);
+};
+if (veldLayer.getLayers().length > 0) {
+  overlays['Veldwaarnemingen'] = veldLayer;
+}
+L.control.layers(null, overlays, {collapsed: true, position: 'topleft'}).addTo(map);
 
 // Fit bounds
 var bounds = L.latLngBounds();
