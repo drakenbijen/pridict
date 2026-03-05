@@ -2531,70 +2531,68 @@ function syncNaarPC() {
 
   // Detecteer of we al op de sync server draaien (lokaal IP)
   var opSyncServer = (location.port === '8765');
-  var baseUrl = '';
 
-  if (opSyncServer) {
-    // Kaart wordt geserveerd door de sync server → direct synchen
-    baseUrl = '';
-  } else {
-    // Kaart draait op GitHub Pages → vraag IP
-    var syncIp = prompt(
-      'Sync naar PC\n\n' +
-      'Voer het IP-adres van je PC in (zie control panel).\n' +
-      'Voorbeeld: 192.168.1.100\n\n' +
-      'Tip: open de kaart via http://PC-IP:8765/kaart\n' +
-      'dan hoef je dit niet meer in te vullen.',
-      localStorage.getItem('predict_sync_ip') || ''
-    );
-    if (!syncIp) return;
-    localStorage.setItem('predict_sync_ip', syncIp);
-    baseUrl = 'http://' + syncIp + ':8765';
-  }
-
-  // Sync feedback
+  // Verzamel data
   var fb = getFeedbackData();
   var fotos = [];
   try { fotos = JSON.parse(localStorage.getItem('predict_fotos') || '[]'); } catch(e) {}
 
-  var stappen = [];
-  if (fb.length > 0) stappen.push('feedback');
-  if (fotos.length > 0) stappen.push('fotos');
-
-  if (stappen.length === 0) {
+  if (fb.length === 0 && fotos.length === 0) {
     toonToast('Geen data om te synchroniseren');
     return;
   }
 
-  toonToast('Synchroniseren...');
+  if (opSyncServer) {
+    // Op sync server: directe fetch (zelfde origin)
+    toonToast('Synchroniseren...');
+    var resultaten = [];
+    var stappen = [];
+    if (fb.length > 0) stappen.push('feedback');
+    if (fotos.length > 0) stappen.push('fotos');
 
-  var resultaten = [];
-
-  function doeSync(idx) {
-    if (idx >= stappen.length) {
-      toonToast('Sync klaar: ' + resultaten.join(', '));
-      return;
+    function doeSync(idx) {
+      if (idx >= stappen.length) {
+        toonToast('Sync klaar: ' + resultaten.join(', '));
+        return;
+      }
+      var stap = stappen[idx];
+      fetch('/sync/' + stap, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(stap === 'feedback' ? fb : fotos)
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        resultaten.push(d.message || stap + ' OK');
+        doeSync(idx + 1);
+      })
+      .catch(function(e) {
+        resultaten.push(stap + ' mislukt');
+        doeSync(idx + 1);
+      });
     }
-    var stap = stappen[idx];
-    var url = baseUrl + '/sync/' + stap;
-    var data = stap === 'feedback' ? fb : fotos;
+    doeSync(0);
+  } else {
+    // Op GitHub Pages (HTTPS): redirect-methode
+    // fetch() naar HTTP is geblokkeerd, maar navigatie niet
+    var syncIp = prompt(
+      'Sync naar PC\n\n' +
+      'Voer het IP-adres van je PC in (zie control panel).\n' +
+      'Voorbeeld: 192.168.1.100',
+      localStorage.getItem('predict_sync_ip') || ''
+    );
+    if (!syncIp) return;
+    localStorage.setItem('predict_sync_ip', syncIp);
 
-    fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(d) {
-      resultaten.push(d.message || stap + ' OK');
-      doeSync(idx + 1);
-    })
-    .catch(function(e) {
-      resultaten.push(stap + ' mislukt: ' + e.message);
-      doeSync(idx + 1);
-    });
+    // Encodeer data in URL en navigeer (geen fetch nodig)
+    var syncData = JSON.stringify({ feedback: fb, fotos: fotos });
+    var encoded = btoa(unescape(encodeURIComponent(syncData)));
+    var syncUrl = 'http://' + syncIp + ':8765/sync/receive?data=' + encodeURIComponent(encoded);
+
+    // Open in nieuw tabblad zodat deze pagina open blijft
+    toonToast('Sync openen in nieuw tabblad...');
+    window.open(syncUrl, '_blank');
   }
-
-  doeSync(0);
 }
 
 // === Foto-systeem ===
