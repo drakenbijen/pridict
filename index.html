@@ -109,6 +109,9 @@
   }
   .feedback-optie:active { transform: scale(0.97); }
   .feedback-optie.groen { border-color: #28a745; background: #d4edda; }
+  .feedback-optie.blauw { border-color: #2980b9; background: #dbeafe; }
+  .feedback-optie.bruin { border-color: #8B4513; background: #f5e6d3; }
+  .feedback-optie.paars { border-color: #8e44ad; background: #f0e6f6; }
   .feedback-optie.oranje { border-color: #e67e22; background: #fef3e2; }
   .feedback-optie.rood { border-color: #e74c3c; background: #fde8e8; }
   .feedback-optie .fb-icon { font-size: 24px; flex-shrink: 0; }
@@ -347,22 +350,43 @@
 <!-- Feedback overlay + paneel -->
 <div class="feedback-overlay" id="fbOverlay" onclick="sluitFeedback()"></div>
 <div class="feedback-panel" id="fbPanel">
-  <h4>Veldwaarneming toevoegen</h4>
+  <h4 id="fbTitel">Veldwaarneming toevoegen</h4>
   <div class="feedback-coords" id="fbCoords">Locatie: je GPS-positie</div>
-  <div class="feedback-opties">
-    <div class="feedback-optie groen" onclick="verzendFeedback('gevonden')">
+  <div class="feedback-opties" id="fbOpties">
+    <div class="feedback-optie groen" onclick="kiesType('burcht')">
       <span class="fb-icon">&#9989;</span>
       <div class="fb-tekst">Burcht gevonden<small>Actieve of verlaten dassenburcht</small></div>
     </div>
-    <div class="feedback-optie oranje" onclick="verzendFeedback('sporen')">
+    <div class="feedback-optie blauw" onclick="kiesType('wissel')">
       <span class="fb-icon">&#128062;</span>
-      <div class="fb-tekst">Sporen gezien<small>Paden, latrines, graafsporen, haren</small></div>
+      <div class="fb-tekst">Dassenpad / wissel<small>Duidelijk pad door begroeiing</small></div>
     </div>
-    <div class="feedback-optie rood" onclick="verzendFeedback('leeg')">
+    <div class="feedback-optie bruin" onclick="kiesType('graafspoor')">
+      <span class="fb-icon">&#9935;</span>
+      <div class="fb-tekst">Graafsporen<small>Graafkuiltjes in gras of grond</small></div>
+    </div>
+    <div class="feedback-optie paars" onclick="kiesType('haar')">
+      <span class="fb-icon">&#128300;</span>
+      <div class="fb-tekst">Haren gevonden<small>Dassenharen aan prikkeldraad/struik</small></div>
+    </div>
+    <div class="feedback-optie oranje" onclick="kiesType('sporen')">
+      <span class="fb-icon">&#128064;</span>
+      <div class="fb-tekst">Overige sporen<small>Latrines, krabsporen, prooiresten</small></div>
+    </div>
+    <div class="feedback-optie rood" onclick="kiesType('leeg')">
       <span class="fb-icon">&#10060;</span>
       <div class="fb-tekst">Niets gevonden<small>Locatie bezocht, geen aanwijzingen</small></div>
     </div>
   </div>
+  <!-- Foto-vraag (verschijnt na type-keuze) -->
+  <div id="fbFotoVraag" style="display:none; text-align:center; padding: 12px 0;">
+    <p style="margin:0 0 8px; font-size:15px; color:#2c3e50;" id="fbFotoTekst">Wil je een foto maken?</p>
+    <div style="display:flex; gap:10px; justify-content:center;">
+      <button onclick="fotoNaType()" style="padding:12px 24px; background:#2980b9; color:white; border:none; border-radius:10px; font-size:15px; cursor:pointer; display:flex; align-items:center; gap:6px;">&#128247; Maak foto</button>
+      <button onclick="slaOpZonderFoto()" style="padding:12px 24px; background:#95a5a6; color:white; border:none; border-radius:10px; font-size:15px; cursor:pointer;">Sla over</button>
+    </div>
+  </div>
+  <input type="file" accept="image/*" capture="environment" id="fbCameraInput" style="display:none">
   <button class="feedback-sluiten" onclick="sluitFeedback()">Annuleren</button>
 </div>
 <div class="feedback-toast" id="fbToast"></div>
@@ -398,7 +422,7 @@
 </div>
 
 <script>
-var map = L.map('map', {zoomControl: false}).setView([51.26258271724509, 6.027684664895577], 14);
+var map = L.map('map', {zoomControl: false}).setView([51.260368074999995, 6.0372524455726655], 14);
 
 L.control.zoom({position: 'bottomleft'}).addTo(map);
 
@@ -457,593 +481,593 @@ var voorspelLayer = L.layerGroup().addTo(map);
         }).addTo(voorspelLayer)
           .bindPopup('<b>#2 — Zeer kansrijk</b><br>Score: 0.93 | GBIF: 186<br>Bos: 5.0m | Gras: 14.0m<br>Water: 332.0m | Bebouwing: 155.0m<br>Helling: 1.1° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.261508,6.020579&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
-        L.circleMarker([51.264877, 6.022733], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#3 — Zeer kansrijk</b><br>Score: 0.93 | GBIF: 186<br>Bos: 21.0m | Gras: 10.0m<br>Water: 48.0m | Bebouwing: 231.0m<br>Helling: 1.0° | Bodem: zand | GW: 100% | Gewas: Grasland, natuurlijk. Met landbouwactiviteiten. <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.264877,6.022733&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
         L.circleMarker([51.260161, 6.011966], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#4 — Zeer kansrijk</b><br>Score: 0.92 | GBIF: 186<br>Bos: 47.0m | Gras: 24.0m<br>Water: 318.0m | Bebouwing: 191.0m<br>Helling: 3.4° | Bodem: zand | GW: 100% | Gewas: Grasland, natuurlijk. Met landbouwactiviteiten. <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.260161,6.011966&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.270267, 6.017349], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#5 — Zeer kansrijk</b><br>Score: 0.91 | GBIF: 66<br>Bos: 13.0m | Gras: 5.0m<br>Water: 204.0m | Bebouwing: 212.0m<br>Helling: 2.1° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.270267,6.017349&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#3 — Zeer kansrijk</b><br>Score: 0.92 | GBIF: 186<br>Bos: 47.0m | Gras: 24.0m<br>Water: 318.0m | Bebouwing: 191.0m<br>Helling: 3.4° | Bodem: zand | GW: 100% | Gewas: Grasland, natuurlijk. Met landbouwactiviteiten. <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.260161,6.011966&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.261508, 6.02704], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#6 — Zeer kansrijk</b><br>Score: 0.91 | GBIF: 186<br>Bos: 14.0m | Gras: 4.0m<br>Water: 357.0m | Bebouwing: 328.0m<br>Helling: 3.0° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.261508,6.02704&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#4 — Zeer kansrijk</b><br>Score: 0.91 | GBIF: 186<br>Bos: 14.0m | Gras: 4.0m<br>Water: 357.0m | Bebouwing: 328.0m<br>Helling: 3.0° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.261508,6.02704&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.264877, 6.023809], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#7 — Zeer kansrijk</b><br>Score: 0.91 | GBIF: 186<br>Bos: 3.0m | Gras: 18.0m<br>Water: 119.0m | Bebouwing: 156.0m<br>Helling: 0.8° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.264877,6.023809&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.263529, 6.021656], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#8 — Zeer kansrijk</b><br>Score: 0.90 | GBIF: 186<br>Bos: 67.0m | Gras: 50.0m<br>Water: 114.0m | Bebouwing: 334.0m<br>Helling: 1.3° | Bodem: zand | GW: 100% | Gewas: Grasland, natuurlijk. Met landbouwactiviteiten. <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.263529,6.021656&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#5 — Zeer kansrijk</b><br>Score: 0.91 | GBIF: 186<br>Bos: 3.0m | Gras: 18.0m<br>Water: 119.0m | Bebouwing: 156.0m<br>Helling: 0.8° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.264877,6.023809&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.260834, 6.015196], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#9 — Zeer kansrijk</b><br>Score: 0.90 | GBIF: 186<br>Bos: 39.0m | Gras: 34.0m<br>Water: 324.0m | Bebouwing: 85.0m<br>Helling: 1.3° | Bodem: zand | GW: 100% | Gewas: Grasland, blijvend <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.260834,6.015196&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#6 — Zeer kansrijk</b><br>Score: 0.90 | GBIF: 186<br>Bos: 39.0m | Gras: 34.0m<br>Water: 324.0m | Bebouwing: 85.0m<br>Helling: 1.3° | Bodem: zand | GW: 100% | Gewas: Grasland, blijvend <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.260834,6.015196&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.260834, 6.014119], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#10 — Zeer kansrijk</b><br>Score: 0.90 | GBIF: 186<br>Bos: 8.0m | Gras: 24.0m<br>Water: 293.0m | Bebouwing: 160.0m<br>Helling: 0.4° | Bodem: zand | GW: 100% | Gewas: Grasland, natuurlijk. Met landbouwactiviteiten. <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.260834,6.014119&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#7 — Zeer kansrijk</b><br>Score: 0.90 | GBIF: 186<br>Bos: 8.0m | Gras: 24.0m<br>Water: 293.0m | Bebouwing: 160.0m<br>Helling: 0.4° | Bodem: zand | GW: 100% | Gewas: Grasland, natuurlijk. Met landbouwactiviteiten. <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.260834,6.014119&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.262182, 6.021656], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#11 — Zeer kansrijk</b><br>Score: 0.90 | GBIF: 186<br>Bos: 7.0m | Gras: 7.0m<br>Water: 263.0m | Bebouwing: 258.0m<br>Helling: 0.5° | Bodem: zand | GW: 100% | Gewas: Grasland, natuurlijk. Met landbouwactiviteiten. <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.262182,6.021656&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.262856, 6.021656], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#12 — Zeer kansrijk</b><br>Score: 0.90 | GBIF: 186<br>Bos: 10.0m | Gras: 8.0m<br>Water: 188.0m | Bebouwing: 306.0m<br>Helling: 0.4° | Bodem: zand | GW: 100% | Gewas: Grasland, natuurlijk. Met landbouwactiviteiten. <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.262856,6.021656&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#8 — Zeer kansrijk</b><br>Score: 0.90 | GBIF: 186<br>Bos: 7.0m | Gras: 7.0m<br>Water: 263.0m | Bebouwing: 258.0m<br>Helling: 0.5° | Bodem: zand | GW: 100% | Gewas: Grasland, natuurlijk. Met landbouwactiviteiten. <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.262182,6.021656&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.285763, 5.992586], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#13 — Zeer kansrijk</b><br>Score: 0.90 | GBIF: 1<br>Bos: 49.0m | Gras: 40.0m<br>Water: 165.0m | Bebouwing: 475.0m<br>Helling: 3.2° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.285763,5.992586&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.257466, 6.016273], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#14 — Zeer kansrijk</b><br>Score: 0.90 | GBIF: 186<br>Bos: 22.0m | Gras: 22.0m<br>Water: 183.0m | Bebouwing: 69.0m<br>Helling: 3.4° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.257466,6.016273&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#9 — Zeer kansrijk</b><br>Score: 0.90 | GBIF: 1<br>Bos: 49.0m | Gras: 40.0m<br>Water: 165.0m | Bebouwing: 475.0m<br>Helling: 3.2° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.285763,5.992586&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.260834, 6.018426], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#15 — Zeer kansrijk</b><br>Score: 0.90 | GBIF: 186<br>Bos: 31.0m | Gras: 21.0m<br>Water: 384.0m | Bebouwing: 12.0m<br>Helling: 1.6° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.260834,6.018426&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#10 — Zeer kansrijk</b><br>Score: 0.90 | GBIF: 186<br>Bos: 31.0m | Gras: 21.0m<br>Water: 384.0m | Bebouwing: 12.0m<br>Helling: 1.6° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.260834,6.018426&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.287784, 5.988279], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#16 — Zeer kansrijk</b><br>Score: 0.90 | GBIF: 1<br>Bos: 27.0m | Gras: 29.0m<br>Water: 123.0m | Bebouwing: 561.0m<br>Helling: 4.2° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.287784,5.988279&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.271614, 6.011966], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#17 — Zeer kansrijk</b><br>Score: 0.89 | GBIF: 66<br>Bos: 49.0m | Gras: 37.0m<br>Water: 46.0m | Bebouwing: 42.0m<br>Helling: 3.9° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.271614,6.011966&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#11 — Zeer kansrijk</b><br>Score: 0.90 | GBIF: 1<br>Bos: 27.0m | Gras: 29.0m<br>Water: 123.0m | Bebouwing: 561.0m<br>Helling: 4.2° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.287784,5.988279&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.287784, 5.987202], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#18 — Zeer kansrijk</b><br>Score: 0.89 | GBIF: 1<br>Bos: 41.0m | Gras: 50.0m<br>Water: 82.0m | Bebouwing: 561.0m<br>Helling: 4.9° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.287784,5.987202&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#12 — Zeer kansrijk</b><br>Score: 0.89 | GBIF: 1<br>Bos: 41.0m | Gras: 50.0m<br>Water: 82.0m | Bebouwing: 561.0m<br>Helling: 4.9° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.287784,5.987202&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.290479, 6.008736], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#19 — Zeer kansrijk</b><br>Score: 0.89 | GBIF: 1<br>Bos: 14.0m | Gras: 14.0m<br>Water: 108.0m | Bebouwing: 114.0m<br>Helling: 2.0° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.290479,6.008736&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.264203, 6.021656], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#20 — Zeer kansrijk</b><br>Score: 0.89 | GBIF: 186<br>Bos: 14.0m | Gras: 21.0m<br>Water: 41.0m | Bebouwing: 311.0m<br>Helling: 15.8° | Bodem: zand | GW: 100% | Gewas: Grasland, natuurlijk. Met landbouwactiviteiten. <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.264203,6.021656&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#13 — Zeer kansrijk</b><br>Score: 0.89 | GBIF: 1<br>Bos: 14.0m | Gras: 14.0m<br>Water: 108.0m | Bebouwing: 114.0m<br>Helling: 2.0° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.290479,6.008736&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.261508, 6.021656], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#21 — Zeer kansrijk</b><br>Score: 0.89 | GBIF: 186<br>Bos: 52.0m | Gras: 37.0m<br>Water: 337.0m | Bebouwing: 225.0m<br>Helling: 1.1° | Bodem: zand | GW: 100% | Gewas: Mais, korrel-<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.261508,6.021656&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.270267, 6.016273], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#22 — Zeer kansrijk</b><br>Score: 0.88 | GBIF: 66<br>Bos: 31.0m | Gras: 35.0m<br>Water: 256.0m | Bebouwing: 140.0m<br>Helling: 2.7° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.270267,6.016273&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.273635, 6.010889], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#23 — Zeer kansrijk</b><br>Score: 0.88 | GBIF: 66<br>Bos: 51.0m | Gras: 35.0m<br>Water: 47.0m | Bebouwing: 113.0m<br>Helling: 1.1° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.273635,6.010889&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.255445, 6.02704], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#24 — Zeer kansrijk</b><br>Score: 0.88 | GBIF: 186<br>Bos: 24.0m | Gras: 15.0m<br>Water: 118.0m | Bebouwing: 107.0m<br>Helling: 2.5° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.255445,6.02704&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.263529, 5.997969], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#25 — Zeer kansrijk</b><br>Score: 0.88 | GBIF: 66<br>Bos: 12.0m | Gras: 49.0m<br>Water: 218.0m | Bebouwing: 52.0m<br>Helling: 2.1° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.263529,5.997969&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.263529, 5.999046], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#26 — Zeer kansrijk</b><br>Score: 0.88 | GBIF: 66<br>Bos: 35.0m | Gras: 29.0m<br>Water: 159.0m | Bebouwing: 116.0m<br>Helling: 3.6° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.263529,5.999046&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.264203, 6.000122], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#27 — Zeer kansrijk</b><br>Score: 0.88 | GBIF: 66<br>Bos: 36.0m | Gras: 39.0m<br>Water: 139.0m | Bebouwing: 60.0m<br>Helling: 2.9° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.264203,6.000122&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#14 — Zeer kansrijk</b><br>Score: 0.89 | GBIF: 186<br>Bos: 52.0m | Gras: 37.0m<br>Water: 337.0m | Bebouwing: 225.0m<br>Helling: 1.1° | Bodem: zand | GW: 100% | Gewas: Mais, korrel-<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.261508,6.021656&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.290479, 5.986126], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#28 — Zeer kansrijk</b><br>Score: 0.88 | GBIF: 1<br>Bos: 43.0m | Gras: 23.0m<br>Water: 125.0m | Bebouwing: 867.0m<br>Helling: 2.0° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.290479,5.986126&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#15 — Zeer kansrijk</b><br>Score: 0.88 | GBIF: 1<br>Bos: 43.0m | Gras: 23.0m<br>Water: 125.0m | Bebouwing: 867.0m<br>Helling: 2.0° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.290479,5.986126&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.259487, 6.011966], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#29 — Zeer kansrijk</b><br>Score: 0.88 | GBIF: 186<br>Bos: 69.0m | Gras: 8.0m<br>Water: 244.0m | Bebouwing: 151.0m<br>Helling: 1.3° | Bodem: zand | GW: 100% | Gewas: Grasland, blijvend <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.259487,6.011966&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#16 — Zeer kansrijk</b><br>Score: 0.88 | GBIF: 186<br>Bos: 69.0m | Gras: 8.0m<br>Water: 244.0m | Bebouwing: 151.0m<br>Helling: 1.3° | Bodem: zand | GW: 100% | Gewas: Grasland, blijvend <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.259487,6.011966&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.285089, 5.990432], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#30 — Zeer kansrijk</b><br>Score: 0.88 | GBIF: 1<br>Bos: 27.0m | Gras: 27.0m<br>Water: 207.0m | Bebouwing: 321.0m<br>Helling: 0.5° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.285089,5.990432&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#17 — Zeer kansrijk</b><br>Score: 0.88 | GBIF: 1<br>Bos: 27.0m | Gras: 27.0m<br>Water: 207.0m | Bebouwing: 321.0m<br>Helling: 0.5° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.285089,5.990432&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.285089, 5.991509], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#31 — Zeer kansrijk</b><br>Score: 0.88 | GBIF: 1<br>Bos: 37.0m | Gras: 37.0m<br>Water: 152.0m | Bebouwing: 369.0m<br>Helling: 0.7° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.285089,5.991509&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#18 — Zeer kansrijk</b><br>Score: 0.88 | GBIF: 1<br>Bos: 37.0m | Gras: 37.0m<br>Water: 152.0m | Bebouwing: 369.0m<br>Helling: 0.7° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.285089,5.991509&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.28711, 5.989356], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#32 — Zeer kansrijk</b><br>Score: 0.88 | GBIF: 1<br>Bos: 42.0m | Gras: 42.0m<br>Water: 193.0m | Bebouwing: 498.0m<br>Helling: 2.9° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.28711,5.989356&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#19 — Zeer kansrijk</b><br>Score: 0.88 | GBIF: 1<br>Bos: 42.0m | Gras: 42.0m<br>Water: 193.0m | Bebouwing: 498.0m<br>Helling: 2.9° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.28711,5.989356&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.260834, 6.025963], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#33 — Zeer kansrijk</b><br>Score: 0.88 | GBIF: 186<br>Bos: 25.0m | Gras: 14.0m<br>Water: 459.0m | Bebouwing: 380.0m<br>Helling: 11.9° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.260834,6.025963&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.270267, 6.011966], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#34 — Zeer kansrijk</b><br>Score: 0.88 | GBIF: 66<br>Bos: 11.0m | Gras: 11.0m<br>Water: 88.0m | Bebouwing: 112.0m<br>Helling: 0.6° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.270267,6.011966&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#20 — Zeer kansrijk</b><br>Score: 0.88 | GBIF: 186<br>Bos: 25.0m | Gras: 14.0m<br>Water: 459.0m | Bebouwing: 380.0m<br>Helling: 11.9° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.260834,6.025963&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.285763, 5.990432], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#35 — Zeer kansrijk</b><br>Score: 0.88 | GBIF: 1<br>Bos: 23.0m | Gras: 23.0m<br>Water: 258.0m | Bebouwing: 384.0m<br>Helling: 0.9° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.285763,5.990432&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#21 — Zeer kansrijk</b><br>Score: 0.88 | GBIF: 1<br>Bos: 23.0m | Gras: 23.0m<br>Water: 258.0m | Bebouwing: 384.0m<br>Helling: 0.9° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.285763,5.990432&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.264203, 6.032423], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#36 — Zeer kansrijk</b><br>Score: 0.88 | GBIF: 186<br>Bos: 14.0m | Gras: 14.0m<br>Water: 201.0m | Bebouwing: 93.0m<br>Helling: 3.2° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.264203,6.032423&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#22 — Zeer kansrijk</b><br>Score: 0.88 | GBIF: 186<br>Bos: 14.0m | Gras: 14.0m<br>Water: 201.0m | Bebouwing: 93.0m<br>Helling: 3.2° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.264203,6.032423&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.260834, 6.016273], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#37 — Zeer kansrijk</b><br>Score: 0.88 | GBIF: 186<br>Bos: 108.0m | Gras: 7.0m<br>Water: 361.0m | Bebouwing: 11.0m<br>Helling: 3.4° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.260834,6.016273&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.269593, 6.011966], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#38 — Zeer kansrijk</b><br>Score: 0.88 | GBIF: 66<br>Bos: 27.0m | Gras: 27.0m<br>Water: 157.0m | Bebouwing: 165.0m<br>Helling: 0.9° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.269593,6.011966&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.268919, 6.010889], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#39 — Zeer kansrijk</b><br>Score: 0.88 | GBIF: 66<br>Bos: 31.0m | Gras: 31.0m<br>Water: 190.0m | Bebouwing: 141.0m<br>Helling: 9.8° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.268919,6.010889&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.270267, 6.014119], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#40 — Zeer kansrijk</b><br>Score: 0.87 | GBIF: 66<br>Bos: 43.0m | Gras: 33.0m<br>Water: 209.0m | Bebouwing: 48.0m<br>Helling: 1.8° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.270267,6.014119&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.270267, 6.018426], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#41 — Zeer kansrijk</b><br>Score: 0.87 | GBIF: 66<br>Bos: 64.0m | Gras: 44.0m<br>Water: 146.0m | Bebouwing: 285.0m<br>Helling: 10.2° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.270267,6.018426&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.269593, 6.016273], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#42 — Zeer kansrijk</b><br>Score: 0.87 | GBIF: 66<br>Bos: 31.0m | Gras: 23.0m<br>Water: 216.0m | Bebouwing: 133.0m<br>Helling: 7.2° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.269593,6.016273&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.252076, 6.007659], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#43 — Zeer kansrijk</b><br>Score: 0.87 | GBIF: 186<br>Bos: 17.0m | Gras: 17.0m<br>Water: 29.0m | Bebouwing: 362.0m<br>Helling: 2.2° | Bodem: rivierklei | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.252076,6.007659&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.269593, 6.014119], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#44 — Zeer kansrijk</b><br>Score: 0.87 | GBIF: 66<br>Bos: 11.0m | Gras: 11.0m<br>Water: 246.0m | Bebouwing: 27.0m<br>Helling: 2.8° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.269593,6.014119&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#23 — Zeer kansrijk</b><br>Score: 0.88 | GBIF: 186<br>Bos: 108.0m | Gras: 7.0m<br>Water: 361.0m | Bebouwing: 11.0m<br>Helling: 3.4° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.260834,6.016273&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.258813, 6.02704], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#45 — Zeer kansrijk</b><br>Score: 0.87 | GBIF: 186<br>Bos: 50.0m | Gras: 29.0m<br>Water: 434.0m | Bebouwing: 327.0m<br>Helling: 1.1° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.258813,6.02704&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#24 — Zeer kansrijk</b><br>Score: 0.87 | GBIF: 186<br>Bos: 50.0m | Gras: 29.0m<br>Water: 434.0m | Bebouwing: 327.0m<br>Helling: 1.1° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.258813,6.02704&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.258139, 6.024886], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#46 — Zeer kansrijk</b><br>Score: 0.87 | GBIF: 186<br>Bos: 44.0m | Gras: 14.0m<br>Water: 432.0m | Bebouwing: 159.0m<br>Helling: 3.9° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.258139,6.024886&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.270267, 6.010889], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#47 — Zeer kansrijk</b><br>Score: 0.87 | GBIF: 66<br>Bos: 13.0m | Gras: 13.0m<br>Water: 81.0m | Bebouwing: 142.0m<br>Helling: 10.8° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.270267,6.010889&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#25 — Zeer kansrijk</b><br>Score: 0.87 | GBIF: 186<br>Bos: 44.0m | Gras: 14.0m<br>Water: 432.0m | Bebouwing: 159.0m<br>Helling: 3.9° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.258139,6.024886&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.264203, 6.023809], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#48 — Zeer kansrijk</b><br>Score: 0.87 | GBIF: 186<br>Bos: 45.0m | Gras: 45.0m<br>Water: 126.0m | Bebouwing: 167.0m<br>Helling: 0.8° | Bodem: zand | GW: 100% | Gewas: Mais, korrel-<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.264203,6.023809&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#26 — Zeer kansrijk</b><br>Score: 0.87 | GBIF: 186<br>Bos: 45.0m | Gras: 45.0m<br>Water: 126.0m | Bebouwing: 167.0m<br>Helling: 0.8° | Bodem: zand | GW: 100% | Gewas: Mais, korrel-<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.264203,6.023809&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.260834, 6.024886], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#49 — Zeer kansrijk</b><br>Score: 0.87 | GBIF: 186<br>Bos: 56.0m | Gras: 50.0m<br>Water: 460.0m | Bebouwing: 328.0m<br>Helling: 2.4° | Bodem: zand | GW: 100% | Gewas: Mais, korrel-<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.260834,6.024886&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#27 — Zeer kansrijk</b><br>Score: 0.87 | GBIF: 186<br>Bos: 56.0m | Gras: 50.0m<br>Water: 460.0m | Bebouwing: 328.0m<br>Helling: 2.4° | Bodem: zand | GW: 100% | Gewas: Mais, korrel-<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.260834,6.024886&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.260834, 6.020579], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#50 — Zeer kansrijk</b><br>Score: 0.87 | GBIF: 186<br>Bos: 40.0m | Gras: 29.0m<br>Water: 406.0m | Bebouwing: 140.0m<br>Helling: 1.6° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.260834,6.020579&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#28 — Zeer kansrijk</b><br>Score: 0.87 | GBIF: 186<br>Bos: 40.0m | Gras: 29.0m<br>Water: 406.0m | Bebouwing: 140.0m<br>Helling: 1.6° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.260834,6.020579&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.260161, 6.024886], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#51 — Zeer kansrijk</b><br>Score: 0.87 | GBIF: 186<br>Bos: 20.0m | Gras: 23.0m<br>Water: 529.0m | Bebouwing: 274.0m<br>Helling: 1.9° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.260161,6.024886&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#29 — Zeer kansrijk</b><br>Score: 0.87 | GBIF: 186<br>Bos: 20.0m | Gras: 23.0m<br>Water: 529.0m | Bebouwing: 274.0m<br>Helling: 1.9° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.260161,6.024886&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.275657, 6.045343], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#52 — Zeer kansrijk</b><br>Score: 0.87 | GBIF: 121<br>Bos: 29.0m | Gras: 29.0m<br>Water: 322.0m | Bebouwing: 79.0m<br>Helling: 2.8° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.275657,6.045343&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#30 — Zeer kansrijk</b><br>Score: 0.87 | GBIF: 121<br>Bos: 29.0m | Gras: 29.0m<br>Water: 322.0m | Bebouwing: 79.0m<br>Helling: 2.8° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.275657,6.045343&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.283068, 5.985049], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#53 — Zeer kansrijk</b><br>Score: 0.87 | GBIF: 1<br>Bos: 33.0m | Gras: 33.0m<br>Water: 321.0m | Bebouwing: 184.0m<br>Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.283068,5.985049&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.252076, 6.004429], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#54 — Zeer kansrijk</b><br>Score: 0.87 | GBIF: 66<br>Bos: 21.0m | Gras: 20.0m<br>Water: 36.0m | Bebouwing: 180.0m<br>Helling: 1.3° | Bodem: rivierklei | GW: 100% | Gewas: Grasland, blijvend <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.252076,6.004429&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.256118, 5.989356], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#55 — Zeer kansrijk</b><br>Score: 0.86 | GBIF: 65<br>Bos: 32.0m | Gras: 23.0m<br>Water: 190.0m | Bebouwing: 45.0m<br>Helling: 4.1° | Bodem: rivierklei | GW: 100% | Gewas: Grasland, blijvend <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.256118,5.989356&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.272962, 6.009813], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#56 — Zeer kansrijk</b><br>Score: 0.86 | GBIF: 66<br>Bos: 34.0m | Gras: 34.0m<br>Water: 48.0m | Bebouwing: 113.0m<br>Helling: 0.7° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.272962,6.009813&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#31 — Zeer kansrijk</b><br>Score: 0.87 | GBIF: 1<br>Bos: 33.0m | Gras: 33.0m<br>Water: 321.0m | Bebouwing: 184.0m<br>Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.283068,5.985049&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.290479, 5.985049], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#57 — Zeer kansrijk</b><br>Score: 0.86 | GBIF: 1<br>Bos: 12.0m | Gras: 20.0m<br>Water: 198.0m | Bebouwing: 879.0m<br>Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.290479,5.985049&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#32 — Zeer kansrijk</b><br>Score: 0.86 | GBIF: 1<br>Bos: 12.0m | Gras: 20.0m<br>Water: 198.0m | Bebouwing: 879.0m<br>Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.290479,5.985049&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.291152, 5.985049], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#58 — Zeer kansrijk</b><br>Score: 0.86 | GBIF: 1<br>Bos: 37.0m | Gras: 37.0m<br>Water: 200.0m | Bebouwing: 953.0m<br>Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.291152,5.985049&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.269593, 6.010889], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#59 — Zeer kansrijk</b><br>Score: 0.86 | GBIF: 66<br>Bos: 19.0m | Gras: 19.0m<br>Water: 154.0m | Bebouwing: 135.0m<br>Helling: 19.7° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.269593,6.010889&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#33 — Zeer kansrijk</b><br>Score: 0.86 | GBIF: 1<br>Bos: 37.0m | Gras: 37.0m<br>Water: 200.0m | Bebouwing: 953.0m<br>Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.291152,5.985049&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.275657, 6.04642], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#60 — Zeer kansrijk</b><br>Score: 0.86 | GBIF: 121<br>Bos: 10.0m | Gras: 10.0m<br>Water: 382.0m | Bebouwing: 109.0m<br>Helling: 2.5° | Bodem: zand | GW: 100% | Gewas: Grasland, blijvend <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.275657,6.04642&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.274309, 6.015196], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#61 — Zeer kansrijk</b><br>Score: 0.86 | GBIF: 66<br>Bos: 33.0m | Gras: 33.0m<br>Water: 131.0m | Bebouwing: 218.0m<br>Helling: 2.8° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.274309,6.015196&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.258813, 6.015196], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#62 — Zeer kansrijk</b><br>Score: 0.86 | GBIF: 186<br>Bos: 110.0m | Gras: 22.0m<br>Water: 266.0m | Bebouwing: 37.0m<br>Helling: 2.8° | Bodem: zand | GW: 100% | Gewas: Grasland, blijvend <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.258813,6.015196&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.256792, 6.03027], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#63 — Zeer kansrijk</b><br>Score: 0.86 | GBIF: 186<br>Bos: 27.0m | Gras: 27.0m<br>Water: 224.0m | Bebouwing: 162.0m<br>Helling: 2.0° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.256792,6.03027&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.271614, 6.019503], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#64 — Zeer kansrijk</b><br>Score: 0.86 | GBIF: 66<br>Bos: 62.0m | Gras: 35.0m<br>Water: 195.0m | Bebouwing: 356.0m<br>Helling: 2.6° | Bodem: onbekend | GW: 70%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.271614,6.019503&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.255445, 5.990432], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#65 — Zeer kansrijk</b><br>Score: 0.86 | GBIF: 65<br>Bos: 24.0m | Gras: 26.0m<br>Water: 292.0m | Bebouwing: 32.0m<br>Helling: 4.7° | Bodem: rivierklei | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.255445,5.990432&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#34 — Zeer kansrijk</b><br>Score: 0.86 | GBIF: 121<br>Bos: 10.0m | Gras: 10.0m<br>Water: 382.0m | Bebouwing: 109.0m<br>Helling: 2.5° | Bodem: zand | GW: 100% | Gewas: Grasland, blijvend <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.275657,6.04642&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.286436, 5.991509], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#66 — Zeer kansrijk</b><br>Score: 0.86 | GBIF: 1<br>Bos: 17.0m | Gras: 17.0m<br>Water: 264.0m | Bebouwing: 487.0m<br>Helling: 5.2° | Bodem: zand | GW: 100% | Gewas: Triticale <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.286436,5.991509&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#35 — Zeer kansrijk</b><br>Score: 0.86 | GBIF: 1<br>Bos: 17.0m | Gras: 17.0m<br>Water: 264.0m | Bebouwing: 487.0m<br>Helling: 5.2° | Bodem: zand | GW: 100% | Gewas: Triticale <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.286436,5.991509&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
-        L.circleMarker([51.263529, 6.022733], {
+        L.circleMarker([51.289131, 6.06903], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#67 — Zeer kansrijk</b><br>Score: 0.86 | GBIF: 186<br>Bos: 73.0m | Gras: 63.0m<br>Water: 125.0m | Bebouwing: 267.0m<br>Helling: 0.8° | Bodem: zand | GW: 100% | Gewas: Grasland, natuurlijk. Met landbouwactiviteiten. <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.263529,6.022733&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.265551, 6.025963], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#68 — Zeer kansrijk</b><br>Score: 0.86 | GBIF: 186<br>Bos: 80.0m | Gras: 6.0m<br>Water: 125.0m | Bebouwing: 86.0m<br>Helling: 0.7° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.265551,6.025963&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.278351, 6.004429], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#69 — Zeer kansrijk</b><br>Score: 0.86 | GBIF: 1<br>Bos: 44.0m | Gras: 44.0m<br>Water: 281.0m | Bebouwing: 209.0m<br>Helling: 2.7° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.278351,6.004429&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.279025, 6.005506], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#70 — Zeer kansrijk</b><br>Score: 0.86 | GBIF: 1<br>Bos: 46.0m | Gras: 46.0m<br>Water: 255.0m | Bebouwing: 155.0m<br>Helling: 2.3° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.279025,6.005506&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.271614, 5.997969], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#71 — Zeer kansrijk</b><br>Score: 0.86 | GBIF: 66<br>Bos: 31.0m | Gras: 13.0m<br>Water: 452.0m | Bebouwing: 134.0m<br>Helling: 5.0° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.271614,5.997969&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.272962, 6.005506], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#72 — Zeer kansrijk</b><br>Score: 0.86 | GBIF: 66<br>Bos: 49.0m | Gras: 33.0m<br>Water: 101.0m | Bebouwing: 7.0m<br>Helling: 3.8° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.272962,6.005506&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.267572, 6.005506], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#73 — Zeer kansrijk</b><br>Score: 0.86 | GBIF: 66<br>Bos: 47.0m | Gras: 37.0m<br>Water: 94.0m | Bebouwing: 34.0m<br>Helling: 5.1° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.267572,6.005506&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.273635, 6.038883], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#74 — Zeer kansrijk</b><br>Score: 0.86 | GBIF: 121<br>Bos: 35.0m | Gras: 9.0m<br>Water: 31.0m | Bebouwing: 77.0m<br>Helling: 7.2° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.273635,6.038883&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#36 — Zeer kansrijk</b><br>Score: 0.86 | GBIF: 0<br>Bos: 20.0m | Gras: 15.0m<br>Water: 88.0m | Bebouwing: 248.0m<br>Helling: 4.8° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.289131,6.06903&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.282394, 5.985049], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#75 — Zeer kansrijk</b><br>Score: 0.86 | GBIF: 1<br>Bos: 70.0m | Gras: 70.0m<br>Water: 284.0m | Bebouwing: 183.0m<br>Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.282394,5.985049&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#37 — Zeer kansrijk</b><br>Score: 0.86 | GBIF: 1<br>Bos: 70.0m | Gras: 70.0m<br>Water: 284.0m | Bebouwing: 183.0m<br>Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.282394,5.985049&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.284415, 5.985049], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#76 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 1<br>Bos: 20.0m | Gras: 20.0m<br>Water: 274.0m | Bebouwing: 260.0m<br>Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.284415,5.985049&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#38 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 1<br>Bos: 20.0m | Gras: 20.0m<br>Water: 274.0m | Bebouwing: 260.0m<br>Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.284415,5.985049&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.28711, 6.016273], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#77 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 1<br>Bos: 15.0m | Gras: 15.0m<br>Water: 113.0m | Bebouwing: 60.0m<br>Helling: 4.5° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.28711,6.016273&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.290479, 6.05611], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#78 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 0<br>Bos: 36.0m | Gras: 5.0m<br>Water: 168.0m | Bebouwing: 10.0m<br>Helling: 4.4° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.290479,6.05611&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.258813, 6.013043], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#79 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 186<br>Bos: 148.0m | Gras: 32.0m<br>Water: 201.0m | Bebouwing: 56.0m<br>Helling: 9.4° | Bodem: zand | GW: 100% | Gewas: Grasland, blijvend <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.258813,6.013043&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.256118, 5.993662], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#80 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 66<br>Bos: 42.0m | Gras: 42.0m<br>Water: 67.0m | Bebouwing: 101.0m<br>Helling: 2.6° | Bodem: rivierklei | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.256118,5.993662&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#39 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 1<br>Bos: 15.0m | Gras: 15.0m<br>Water: 113.0m | Bebouwing: 60.0m<br>Helling: 4.5° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.28711,6.016273&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.258813, 6.022733], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#81 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 186<br>Bos: 26.0m | Gras: 17.0m<br>Water: 586.0m | Bebouwing: 63.0m<br>Helling: 2.7° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.258813,6.022733&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#40 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 186<br>Bos: 26.0m | Gras: 17.0m<br>Water: 586.0m | Bebouwing: 63.0m<br>Helling: 2.7° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.258813,6.022733&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.290479, 6.009813], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#82 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 1<br>Bos: 18.0m | Gras: 18.0m<br>Water: 179.0m | Bebouwing: 165.0m<br>Helling: 0.4° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.290479,6.009813&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#41 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 1<br>Bos: 18.0m | Gras: 18.0m<br>Water: 179.0m | Bebouwing: 165.0m<br>Helling: 0.4° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.290479,6.009813&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.264203, 6.031346], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#83 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 186<br>Bos: 46.0m | Gras: 46.0m<br>Water: 127.0m | Bebouwing: 60.0m<br>Helling: 2.1° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.264203,6.031346&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#42 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 186<br>Bos: 46.0m | Gras: 46.0m<br>Water: 127.0m | Bebouwing: 60.0m<br>Helling: 2.1° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.264203,6.031346&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.258139, 6.022733], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#84 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 186<br>Bos: 22.0m | Gras: 33.0m<br>Water: 535.0m | Bebouwing: 62.0m<br>Helling: 2.8° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.258139,6.022733&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#43 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 186<br>Bos: 22.0m | Gras: 33.0m<br>Water: 535.0m | Bebouwing: 62.0m<br>Helling: 2.8° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.258139,6.022733&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.264203, 6.029193], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#85 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 186<br>Bos: 30.0m | Gras: 16.0m<br>Water: 23.0m | Bebouwing: 11.0m<br>Helling: 1.2° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.264203,6.029193&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.270267, 6.013043], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#86 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 66<br>Bos: 86.0m | Gras: 16.0m<br>Water: 142.0m | Bebouwing: 99.0m<br>Helling: 0.7° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.270267,6.013043&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#44 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 186<br>Bos: 30.0m | Gras: 16.0m<br>Water: 23.0m | Bebouwing: 11.0m<br>Helling: 1.2° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.264203,6.029193&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.260161, 6.025963], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#87 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 186<br>Bos: 6.0m | Gras: 13.0m<br>Water: 524.0m | Bebouwing: 333.0m<br>Helling: 0.4° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.260161,6.025963&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#45 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 186<br>Bos: 6.0m | Gras: 13.0m<br>Water: 524.0m | Bebouwing: 333.0m<br>Helling: 0.4° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.260161,6.025963&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.260161, 6.02704], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#88 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 186<br>Bos: 10.0m | Gras: 10.0m<br>Water: 494.0m | Bebouwing: 398.0m<br>Helling: 0.6° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.260161,6.02704&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.270267, 6.015196], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#89 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 66<br>Bos: 22.0m | Gras: 16.0m<br>Water: 280.0m | Bebouwing: 75.0m<br>Helling: 1.8° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.270267,6.015196&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#46 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 186<br>Bos: 10.0m | Gras: 10.0m<br>Water: 494.0m | Bebouwing: 398.0m<br>Helling: 0.6° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.260161,6.02704&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.272288, 6.038883], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#90 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 121<br>Bos: 15.0m | Gras: 15.0m<br>Water: 19.0m | Bebouwing: 55.0m<br>Helling: 2.7° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.272288,6.038883&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#47 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 121<br>Bos: 15.0m | Gras: 15.0m<br>Water: 19.0m | Bebouwing: 55.0m<br>Helling: 2.7° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.272288,6.038883&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.262856, 6.022733], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#91 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 186<br>Bos: 83.0m | Gras: 7.0m<br>Water: 196.0m | Bebouwing: 310.0m<br>Helling: 0.6° | Bodem: zand | GW: 100% | Gewas: Grasland, natuurlijk. Met landbouwactiviteiten. <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.262856,6.022733&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#48 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 186<br>Bos: 83.0m | Gras: 7.0m<br>Water: 196.0m | Bebouwing: 310.0m<br>Helling: 0.6° | Bodem: zand | GW: 100% | Gewas: Grasland, natuurlijk. Met landbouwactiviteiten. <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.262856,6.022733&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.291152, 5.987202], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#92 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 1<br>Bos: 19.0m | Gras: 17.0m<br>Water: 59.0m | Bebouwing: 935.0m<br>Helling: 1.4° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.291152,5.987202&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#49 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 1<br>Bos: 19.0m | Gras: 17.0m<br>Water: 59.0m | Bebouwing: 935.0m<br>Helling: 1.4° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.291152,5.987202&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.293174, 5.987202], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#93 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 1<br>Bos: 25.0m | Gras: 25.0m<br>Water: 245.0m | Bebouwing: 1000m<br>Helling: 1.0° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.293174,5.987202&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.271614, 5.994739], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#94 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 66<br>Bos: 60.0m | Gras: 7.0m<br>Water: 463.0m | Bebouwing: 52.0m<br>Helling: 4.6° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.271614,5.994739&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.272288, 6.020579], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#95 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 66<br>Bos: 56.0m | Gras: 44.0m<br>Water: 209.0m | Bebouwing: 347.0m<br>Helling: 2.9° | Bodem: onbekend | GW: 70%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.272288,6.020579&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#50 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 1<br>Bos: 25.0m | Gras: 25.0m<br>Water: 245.0m | Bebouwing: 1000m<br>Helling: 1.0° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.293174,5.987202&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.289805, 6.009813], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#96 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 1<br>Bos: 51.0m | Gras: 51.0m<br>Water: 109.0m | Bebouwing: 120.0m<br>Helling: 2.1° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.289805,6.009813&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.272962, 6.010889], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#97 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 66<br>Bos: 25.0m | Gras: 20.0m<br>Water: 20.0m | Bebouwing: 57.0m<br>Helling: 0.6° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.272962,6.010889&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
-        
-        L.circleMarker([51.271614, 6.018426], {
-            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
-            fillOpacity: 0.8, weight: 2
-        }).addTo(voorspelLayer)
-          .bindPopup('<b>#98 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 66<br>Bos: 14.0m | Gras: 11.0m<br>Water: 243.0m | Bebouwing: 281.0m<br>Helling: 4.2° | Bodem: onbekend | GW: 70%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.271614,6.018426&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#51 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 1<br>Bos: 51.0m | Gras: 51.0m<br>Water: 109.0m | Bebouwing: 120.0m<br>Helling: 2.1° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.289805,6.009813&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.263529, 6.03027], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#99 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 186<br>Bos: 58.0m | Gras: 54.0m<br>Water: 105.0m | Bebouwing: 95.0m<br>Helling: 2.8° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.263529,6.03027&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#52 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 186<br>Bos: 58.0m | Gras: 54.0m<br>Water: 105.0m | Bebouwing: 95.0m<br>Helling: 2.8° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.263529,6.03027&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
-        L.circleMarker([51.264877, 6.025963], {
+        L.circleMarker([51.250055, 6.045343], {
             radius: 8, color: '#dc3545', fillColor: '#e74c3c',
             fillOpacity: 0.8, weight: 2
         }).addTo(voorspelLayer)
-          .bindPopup('<b>#100 — Zeer kansrijk</b><br>Score: 0.85 | GBIF: 186<br>Bos: 75.0m | Gras: 12.0m<br>Water: 163.0m | Bebouwing: 13.0m<br>Helling: 0.5° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.264877,6.025963&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>#53 — Zeer kansrijk</b><br>Score: 0.84 | GBIF: 120<br>Bos: 33.0m | Gras: 33.0m<br>Water: 43.0m | Bebouwing: 488.0m<br>Helling: 3.1° | Bodem: onbekend | GW: 40%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.250055,6.045343&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.285089, 5.994739], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#54 — Zeer kansrijk</b><br>Score: 0.84 | GBIF: 1<br>Bos: 25.0m | Gras: 21.0m<br>Water: 25.0m | Bebouwing: 551.0m<br>Helling: 9.3° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.285089,5.994739&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.284415, 5.995816], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#55 — Zeer kansrijk</b><br>Score: 0.84 | GBIF: 1<br>Bos: 35.0m | Gras: 35.0m<br>Water: 120.0m | Bebouwing: 548.0m<br>Helling: 6.3° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.284415,5.995816&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.274983, 6.05288], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#56 — Zeer kansrijk</b><br>Score: 0.84 | GBIF: 121<br>Bos: 20.0m | Gras: 26.0m<br>Water: 742.0m | Bebouwing: 243.0m<br>Helling: 3.5° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.274983,6.05288&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.263529, 6.032423], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#57 — Zeer kansrijk</b><br>Score: 0.84 | GBIF: 186<br>Bos: 42.0m | Gras: 42.0m<br>Water: 221.0m | Bebouwing: 62.0m<br>Helling: 1.4° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.263529,6.032423&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.27633, 6.045343], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#58 — Zeer kansrijk</b><br>Score: 0.84 | GBIF: 121<br>Bos: 9.0m | Gras: 5.0m<br>Water: 278.0m | Bebouwing: 29.0m<br>Helling: 2.6° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.27633,6.045343&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.251402, 6.045343], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#59 — Zeer kansrijk</b><br>Score: 0.84 | GBIF: 120<br>Bos: 25.0m | Gras: 25.0m<br>Water: 51.0m | Bebouwing: 376.0m<br>Helling: 2.6° | Bodem: onbekend | GW: 40% | Gewas: Grasland, blijvend <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.251402,6.045343&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.284415, 5.991509], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#60 — Zeer kansrijk</b><br>Score: 0.84 | GBIF: 1<br>Bos: 33.0m | Gras: 37.0m<br>Water: 104.0m | Bebouwing: 321.0m<br>Helling: 0.1° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.284415,5.991509&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.28711, 5.993662], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#61 — Zeer kansrijk</b><br>Score: 0.84 | GBIF: 1<br>Bos: 86.0m | Gras: 40.0m<br>Water: 182.0m | Bebouwing: 636.0m<br>Helling: 1.5° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.28711,5.993662&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.290479, 5.987202], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#62 — Zeer kansrijk</b><br>Score: 0.84 | GBIF: 1<br>Bos: 66.0m | Gras: 51.0m<br>Water: 55.0m | Bebouwing: 860.0m<br>Helling: 3.6° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.290479,5.987202&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.27633, 6.04965], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#63 — Zeer kansrijk</b><br>Score: 0.84 | GBIF: 121<br>Bos: 27.0m | Gras: 21.0m<br>Water: 514.0m | Bebouwing: 172.0m<br>Helling: 7.3° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.27633,6.04965&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.268919, 6.0335], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#64 — Zeer kansrijk</b><br>Score: 0.84 | GBIF: 121<br>Bos: 23.0m | Gras: 12.0m<br>Water: 188.0m | Bebouwing: 19.0m<br>Helling: 2.8° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.268919,6.0335&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.258813, 6.023809], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#65 — Zeer kansrijk</b><br>Score: 0.84 | GBIF: 186<br>Bos: 29.0m | Gras: 33.0m<br>Water: 537.0m | Bebouwing: 133.0m<br>Helling: 15.4° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.258813,6.023809&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.288457, 6.067953], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#66 — Zeer kansrijk</b><br>Score: 0.84 | GBIF: 0<br>Bos: 16.0m | Gras: 29.0m<br>Water: 67.0m | Bebouwing: 238.0m<br>Helling: 5.5° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.288457,6.067953&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.275657, 6.048573], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#67 — Zeer kansrijk</b><br>Score: 0.84 | GBIF: 121<br>Bos: 5.0m | Gras: 3.0m<br>Water: 498.0m | Bebouwing: 184.0m<br>Helling: 1.9° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.275657,6.048573&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.253423, 6.048573], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#68 — Zeer kansrijk</b><br>Score: 0.84 | GBIF: 120<br>Bos: 18.0m | Gras: 18.0m<br>Water: 53.0m | Bebouwing: 505.0m<br>Helling: 4.3° | Bodem: onbekend | GW: 40%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.253423,6.048573&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.28711, 5.994739], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#69 — Zeer kansrijk</b><br>Score: 0.84 | GBIF: 1<br>Bos: 26.0m | Gras: 37.0m<br>Water: 119.0m | Bebouwing: 687.0m<br>Helling: 0.4° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.28711,5.994739&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.260834, 6.019503], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#70 — Zeer kansrijk</b><br>Score: 0.84 | GBIF: 186<br>Bos: 26.0m | Gras: 4.0m<br>Water: 396.0m | Bebouwing: 65.0m<br>Helling: 0.3° | Bodem: zand | GW: 100% | Gewas: Grasland, natuurlijk. Met landbouwactiviteiten. <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.260834,6.019503&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.287784, 6.066877], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#71 — Zeer kansrijk</b><br>Score: 0.84 | GBIF: 0<br>Bos: 46.0m | Gras: 21.0m<br>Water: 86.0m | Bebouwing: 206.0m<br>Helling: 5.2° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.287784,6.066877&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.287784, 6.067953], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#72 — Zeer kansrijk</b><br>Score: 0.84 | GBIF: 0<br>Bos: 25.0m | Gras: 22.0m<br>Water: 122.0m | Bebouwing: 167.0m<br>Helling: 5.8° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.287784,6.067953&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.258813, 6.025963], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#73 — Zeer kansrijk</b><br>Score: 0.84 | GBIF: 186<br>Bos: 14.0m | Gras: 11.0m<br>Water: 459.0m | Bebouwing: 264.0m<br>Helling: 0.9° | Bodem: zand | GW: 100% | Gewas: Grasland, blijvend <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.258813,6.025963&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.260161, 6.013043], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#74 — Zeer kansrijk</b><br>Score: 0.84 | GBIF: 186<br>Bos: 103.0m | Gras: 22.0m<br>Water: 336.0m | Bebouwing: 143.0m<br>Helling: 1.8° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.260161,6.013043&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.261508, 6.028116], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#75 — Zeer kansrijk</b><br>Score: 0.84 | GBIF: 186<br>Bos: 49.0m | Gras: 15.0m<br>Water: 328.0m | Bebouwing: 300.0m<br>Helling: 1.1° | Bodem: zand | GW: 100% | Gewas: Mais, korrel-<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.261508,6.028116&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.259487, 6.024886], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#76 — Zeer kansrijk</b><br>Score: 0.84 | GBIF: 186<br>Bos: 5.0m | Gras: 4.0m<br>Water: 559.0m | Bebouwing: 231.0m<br>Helling: 0.6° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.259487,6.024886&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.288457, 6.008736], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#77 — Zeer kansrijk</b><br>Score: 0.84 | GBIF: 1<br>Bos: 43.0m | Gras: 6.0m<br>Water: 59.0m | Bebouwing: 20.0m<br>Helling: 0.3° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.288457,6.008736&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.28711, 5.990432], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#78 — Zeer kansrijk</b><br>Score: 0.84 | GBIF: 1<br>Bos: 6.0m | Gras: 5.0m<br>Water: 267.0m | Bebouwing: 520.0m<br>Helling: 0.6° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.28711,5.990432&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.284415, 5.992586], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#79 — Zeer kansrijk</b><br>Score: 0.83 | GBIF: 1<br>Bos: 49.0m | Gras: 41.0m<br>Water: 48.0m | Bebouwing: 384.0m<br>Helling: 0.0° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.284415,5.992586&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.259487, 6.025963], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#80 — Zeer kansrijk</b><br>Score: 0.83 | GBIF: 186<br>Bos: 31.0m | Gras: 36.0m<br>Water: 529.0m | Bebouwing: 299.0m<br>Helling: 0.4° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.259487,6.025963&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.264203, 6.028116], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#81 — Zeer kansrijk</b><br>Score: 0.83 | GBIF: 186<br>Bos: 100.0m | Gras: 8.0m<br>Water: 77.0m | Bebouwing: 75.0m<br>Helling: 1.5° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.264203,6.028116&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.285763, 5.989356], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#82 — Zeer kansrijk</b><br>Score: 0.83 | GBIF: 1<br>Bos: 44.0m | Gras: 44.0m<br>Water: 218.0m | Bebouwing: 354.0m<br>Helling: 0.2° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.285763,5.989356&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.264877, 6.032423], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#83 — Zeer kansrijk</b><br>Score: 0.83 | GBIF: 186<br>Bos: 40.0m | Gras: 23.0m<br>Water: 208.0m | Bebouwing: 41.0m<br>Helling: 2.2° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.264877,6.032423&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.288457, 5.994739], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#84 — Zeer kansrijk</b><br>Score: 0.83 | GBIF: 1<br>Bos: 62.0m | Gras: 46.0m<br>Water: 245.0m | Bebouwing: 800.0m<br>Helling: 1.5° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.288457,5.994739&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.285089, 5.989356], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#85 — Zeer kansrijk</b><br>Score: 0.83 | GBIF: 1<br>Bos: 55.0m | Gras: 55.0m<br>Water: 261.0m | Bebouwing: 284.0m<br>Helling: 1.7° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.285089,5.989356&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.286436, 5.990432], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#86 — Zeer kansrijk</b><br>Score: 0.83 | GBIF: 1<br>Bos: 68.0m | Gras: 65.0m<br>Water: 268.0m | Bebouwing: 451.0m<br>Helling: 7.2° | Bodem: zand | GW: 100% | Gewas: Triticale <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.286436,5.990432&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.285763, 6.063647], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#87 — Zeer kansrijk</b><br>Score: 0.83 | GBIF: 0<br>Bos: 42.0m | Gras: 40.0m<br>Water: 292.0m | Bebouwing: 107.0m<br>Helling: 3.2° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.285763,6.063647&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.286436, 6.064723], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#88 — Zeer kansrijk</b><br>Score: 0.83 | GBIF: 0<br>Bos: 42.0m | Gras: 40.0m<br>Water: 216.0m | Bebouwing: 59.0m<br>Helling: 2.4° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.286436,6.064723&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.28172, 5.985049], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#89 — Zeer kansrijk</b><br>Score: 0.83 | GBIF: 1<br>Bos: 81.0m | Gras: 81.0m<br>Water: 264.0m | Bebouwing: 209.0m<br>Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.28172,5.985049&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.273635, 6.048573], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#90 — Zeer kansrijk</b><br>Score: 0.83 | GBIF: 121<br>Bos: 5.0m | Gras: 5.0m<br>Water: 417.0m | Bebouwing: 28.0m<br>Helling: 2.3° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.273635,6.048573&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.284415, 5.990432], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#91 — Zeer kansrijk</b><br>Score: 0.83 | GBIF: 1<br>Bos: 36.0m | Gras: 36.0m<br>Water: 175.0m | Bebouwing: 263.0m<br>Helling: 0.1° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.284415,5.990432&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.255445, 6.019503], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#92 — Zeer kansrijk</b><br>Score: 0.83 | GBIF: 186<br>Bos: 69.0m | Gras: 35.0m<br>Water: 209.0m | Bebouwing: 63.0m<br>Helling: 5.6° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.255445,6.019503&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.250728, 6.044266], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#93 — Zeer kansrijk</b><br>Score: 0.83 | GBIF: 120<br>Bos: 61.0m | Gras: 57.0m<br>Water: 66.0m | Bebouwing: 384.0m<br>Helling: 2.3° | Bodem: onbekend | GW: 40% | Gewas: Grasland, blijvend <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.250728,6.044266&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.282394, 6.001199], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#94 — Zeer kansrijk</b><br>Score: 0.83 | GBIF: 1<br>Bos: 16.0m | Gras: 16.0m<br>Water: 181.0m | Bebouwing: 419.0m<br>Helling: 8.6° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.282394,6.001199&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.265551, 6.035653], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#95 — Zeer kansrijk</b><br>Score: 0.83 | GBIF: 121<br>Bos: 14.0m | Gras: 14.0m<br>Water: 91.0m | Bebouwing: 37.0m<br>Helling: 2.5° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.265551,6.035653&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.289131, 6.010889], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#96 — Zeer kansrijk</b><br>Score: 0.83 | GBIF: 1<br>Bos: 107.0m | Gras: 35.0m<br>Water: 113.0m | Bebouwing: 122.0m<br>Helling: 5.4° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.289131,6.010889&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.28172, 6.002276], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#97 — Zeer kansrijk</b><br>Score: 0.83 | GBIF: 1<br>Bos: 47.0m | Gras: 40.0m<br>Water: 151.0m | Bebouwing: 426.0m<br>Helling: 7.2° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.28172,6.002276&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.256118, 6.03673], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#98 — Zeer kansrijk</b><br>Score: 0.83 | GBIF: 186<br>Bos: 27.0m | Gras: 38.0m<br>Water: 568.0m | Bebouwing: 154.0m<br>Helling: 3.0° | Bodem: zand | GW: 100% | Gewas: Luzerne <br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.256118,6.03673&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.265551, 6.034576], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#99 — Zeer kansrijk</b><br>Score: 0.83 | GBIF: 186<br>Bos: 17.0m | Gras: 17.0m<br>Water: 158.0m | Bebouwing: 21.0m<br>Helling: 7.2° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.265551,6.034576&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
+        
+        L.circleMarker([51.286436, 5.992586], {
+            radius: 8, color: '#dc3545', fillColor: '#e74c3c',
+            fillOpacity: 0.8, weight: 2
+        }).addTo(voorspelLayer)
+          .bindPopup('<b>#100 — Zeer kansrijk</b><br>Score: 0.83 | GBIF: 1<br>Bos: 26.0m | Gras: 26.0m<br>Water: 201.0m | Bebouwing: 531.0m<br>Helling: 0.5° | Bodem: zand | GW: 100%<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.286436,5.992586&travelmode=driving\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600\'>Navigeer hierheen &#10148;</a>');
         
 
 // Layer control
@@ -1061,28 +1085,28 @@ bounds.extend([51.275602, 6.0408319]);
 bounds.extend([51.2736279, 6.03221]);
 bounds.extend([51.260834, 6.013043]);
 bounds.extend([51.261508, 6.020579]);
-bounds.extend([51.264877, 6.022733]);
 bounds.extend([51.260161, 6.011966]);
-bounds.extend([51.270267, 6.017349]);
 bounds.extend([51.261508, 6.02704]);
 bounds.extend([51.264877, 6.023809]);
-bounds.extend([51.263529, 6.021656]);
 bounds.extend([51.260834, 6.015196]);
 bounds.extend([51.260834, 6.014119]);
 bounds.extend([51.262182, 6.021656]);
-bounds.extend([51.262856, 6.021656]);
 bounds.extend([51.285763, 5.992586]);
-bounds.extend([51.257466, 6.016273]);
 bounds.extend([51.260834, 6.018426]);
 bounds.extend([51.287784, 5.988279]);
-bounds.extend([51.271614, 6.011966]);
 bounds.extend([51.287784, 5.987202]);
 bounds.extend([51.290479, 6.008736]);
-bounds.extend([51.264203, 6.021656]);
+bounds.extend([51.261508, 6.021656]);
+bounds.extend([51.290479, 5.986126]);
+bounds.extend([51.259487, 6.011966]);
+bounds.extend([51.285089, 5.990432]);
+bounds.extend([51.285089, 5.991509]);
+bounds.extend([51.28711, 5.989356]);
+bounds.extend([51.260834, 6.025963]);
 map.fitBounds(bounds.pad(0.1));
 
 // Voorspellingen data voor afstandsberekening
-var VOORSPELLINGEN = [{"lat": 51.260834, "lon": 6.013043, "score": 0.943, "label": "Zeer kansrijk", "nr": 1}, {"lat": 51.261508, "lon": 6.020579, "score": 0.934, "label": "Zeer kansrijk", "nr": 2}, {"lat": 51.264877, "lon": 6.022733, "score": 0.928, "label": "Zeer kansrijk", "nr": 3}, {"lat": 51.260161, "lon": 6.011966, "score": 0.917, "label": "Zeer kansrijk", "nr": 4}, {"lat": 51.270267, "lon": 6.017349, "score": 0.914, "label": "Zeer kansrijk", "nr": 5}, {"lat": 51.261508, "lon": 6.02704, "score": 0.913, "label": "Zeer kansrijk", "nr": 6}, {"lat": 51.264877, "lon": 6.023809, "score": 0.911, "label": "Zeer kansrijk", "nr": 7}, {"lat": 51.263529, "lon": 6.021656, "score": 0.903, "label": "Zeer kansrijk", "nr": 8}, {"lat": 51.260834, "lon": 6.015196, "score": 0.902, "label": "Zeer kansrijk", "nr": 9}, {"lat": 51.260834, "lon": 6.014119, "score": 0.902, "label": "Zeer kansrijk", "nr": 10}, {"lat": 51.262182, "lon": 6.021656, "score": 0.902, "label": "Zeer kansrijk", "nr": 11}, {"lat": 51.262856, "lon": 6.021656, "score": 0.9, "label": "Zeer kansrijk", "nr": 12}, {"lat": 51.285763, "lon": 5.992586, "score": 0.897, "label": "Zeer kansrijk", "nr": 13}, {"lat": 51.257466, "lon": 6.016273, "score": 0.897, "label": "Zeer kansrijk", "nr": 14}, {"lat": 51.260834, "lon": 6.018426, "score": 0.896, "label": "Zeer kansrijk", "nr": 15}, {"lat": 51.287784, "lon": 5.988279, "score": 0.896, "label": "Zeer kansrijk", "nr": 16}, {"lat": 51.271614, "lon": 6.011966, "score": 0.894, "label": "Zeer kansrijk", "nr": 17}, {"lat": 51.287784, "lon": 5.987202, "score": 0.894, "label": "Zeer kansrijk", "nr": 18}, {"lat": 51.290479, "lon": 6.008736, "score": 0.894, "label": "Zeer kansrijk", "nr": 19}, {"lat": 51.264203, "lon": 6.021656, "score": 0.892, "label": "Zeer kansrijk", "nr": 20}, {"lat": 51.261508, "lon": 6.021656, "score": 0.89, "label": "Zeer kansrijk", "nr": 21}, {"lat": 51.270267, "lon": 6.016273, "score": 0.884, "label": "Zeer kansrijk", "nr": 22}, {"lat": 51.273635, "lon": 6.010889, "score": 0.883, "label": "Zeer kansrijk", "nr": 23}, {"lat": 51.255445, "lon": 6.02704, "score": 0.881, "label": "Zeer kansrijk", "nr": 24}, {"lat": 51.263529, "lon": 5.997969, "score": 0.881, "label": "Zeer kansrijk", "nr": 25}, {"lat": 51.263529, "lon": 5.999046, "score": 0.881, "label": "Zeer kansrijk", "nr": 26}, {"lat": 51.264203, "lon": 6.000122, "score": 0.881, "label": "Zeer kansrijk", "nr": 27}, {"lat": 51.290479, "lon": 5.986126, "score": 0.881, "label": "Zeer kansrijk", "nr": 28}, {"lat": 51.259487, "lon": 6.011966, "score": 0.881, "label": "Zeer kansrijk", "nr": 29}, {"lat": 51.285089, "lon": 5.990432, "score": 0.881, "label": "Zeer kansrijk", "nr": 30}, {"lat": 51.285089, "lon": 5.991509, "score": 0.881, "label": "Zeer kansrijk", "nr": 31}, {"lat": 51.28711, "lon": 5.989356, "score": 0.879, "label": "Zeer kansrijk", "nr": 32}, {"lat": 51.260834, "lon": 6.025963, "score": 0.879, "label": "Zeer kansrijk", "nr": 33}, {"lat": 51.270267, "lon": 6.011966, "score": 0.879, "label": "Zeer kansrijk", "nr": 34}, {"lat": 51.285763, "lon": 5.990432, "score": 0.877, "label": "Zeer kansrijk", "nr": 35}, {"lat": 51.264203, "lon": 6.032423, "score": 0.877, "label": "Zeer kansrijk", "nr": 36}, {"lat": 51.260834, "lon": 6.016273, "score": 0.876, "label": "Zeer kansrijk", "nr": 37}, {"lat": 51.269593, "lon": 6.011966, "score": 0.876, "label": "Zeer kansrijk", "nr": 38}, {"lat": 51.268919, "lon": 6.010889, "score": 0.876, "label": "Zeer kansrijk", "nr": 39}, {"lat": 51.270267, "lon": 6.014119, "score": 0.875, "label": "Zeer kansrijk", "nr": 40}, {"lat": 51.270267, "lon": 6.018426, "score": 0.875, "label": "Zeer kansrijk", "nr": 41}, {"lat": 51.269593, "lon": 6.016273, "score": 0.874, "label": "Zeer kansrijk", "nr": 42}, {"lat": 51.252076, "lon": 6.007659, "score": 0.874, "label": "Zeer kansrijk", "nr": 43}, {"lat": 51.269593, "lon": 6.014119, "score": 0.873, "label": "Zeer kansrijk", "nr": 44}, {"lat": 51.258813, "lon": 6.02704, "score": 0.872, "label": "Zeer kansrijk", "nr": 45}, {"lat": 51.258139, "lon": 6.024886, "score": 0.87, "label": "Zeer kansrijk", "nr": 46}, {"lat": 51.270267, "lon": 6.010889, "score": 0.87, "label": "Zeer kansrijk", "nr": 47}, {"lat": 51.264203, "lon": 6.023809, "score": 0.869, "label": "Zeer kansrijk", "nr": 48}, {"lat": 51.260834, "lon": 6.024886, "score": 0.868, "label": "Zeer kansrijk", "nr": 49}, {"lat": 51.260834, "lon": 6.020579, "score": 0.868, "label": "Zeer kansrijk", "nr": 50}, {"lat": 51.260161, "lon": 6.024886, "score": 0.867, "label": "Zeer kansrijk", "nr": 51}, {"lat": 51.275657, "lon": 6.045343, "score": 0.867, "label": "Zeer kansrijk", "nr": 52}, {"lat": 51.283068, "lon": 5.985049, "score": 0.866, "label": "Zeer kansrijk", "nr": 53}, {"lat": 51.252076, "lon": 6.004429, "score": 0.865, "label": "Zeer kansrijk", "nr": 54}, {"lat": 51.256118, "lon": 5.989356, "score": 0.865, "label": "Zeer kansrijk", "nr": 55}, {"lat": 51.272962, "lon": 6.009813, "score": 0.863, "label": "Zeer kansrijk", "nr": 56}, {"lat": 51.290479, "lon": 5.985049, "score": 0.863, "label": "Zeer kansrijk", "nr": 57}, {"lat": 51.291152, "lon": 5.985049, "score": 0.863, "label": "Zeer kansrijk", "nr": 58}, {"lat": 51.269593, "lon": 6.010889, "score": 0.862, "label": "Zeer kansrijk", "nr": 59}, {"lat": 51.275657, "lon": 6.04642, "score": 0.862, "label": "Zeer kansrijk", "nr": 60}, {"lat": 51.274309, "lon": 6.015196, "score": 0.862, "label": "Zeer kansrijk", "nr": 61}, {"lat": 51.258813, "lon": 6.015196, "score": 0.861, "label": "Zeer kansrijk", "nr": 62}, {"lat": 51.256792, "lon": 6.03027, "score": 0.859, "label": "Zeer kansrijk", "nr": 63}, {"lat": 51.271614, "lon": 6.019503, "score": 0.859, "label": "Zeer kansrijk", "nr": 64}, {"lat": 51.255445, "lon": 5.990432, "score": 0.859, "label": "Zeer kansrijk", "nr": 65}, {"lat": 51.286436, "lon": 5.991509, "score": 0.858, "label": "Zeer kansrijk", "nr": 66}, {"lat": 51.263529, "lon": 6.022733, "score": 0.858, "label": "Zeer kansrijk", "nr": 67}, {"lat": 51.265551, "lon": 6.025963, "score": 0.857, "label": "Zeer kansrijk", "nr": 68}, {"lat": 51.278351, "lon": 6.004429, "score": 0.857, "label": "Zeer kansrijk", "nr": 69}, {"lat": 51.279025, "lon": 6.005506, "score": 0.857, "label": "Zeer kansrijk", "nr": 70}, {"lat": 51.271614, "lon": 5.997969, "score": 0.856, "label": "Zeer kansrijk", "nr": 71}, {"lat": 51.272962, "lon": 6.005506, "score": 0.856, "label": "Zeer kansrijk", "nr": 72}, {"lat": 51.267572, "lon": 6.005506, "score": 0.856, "label": "Zeer kansrijk", "nr": 73}, {"lat": 51.273635, "lon": 6.038883, "score": 0.856, "label": "Zeer kansrijk", "nr": 74}, {"lat": 51.282394, "lon": 5.985049, "score": 0.855, "label": "Zeer kansrijk", "nr": 75}, {"lat": 51.284415, "lon": 5.985049, "score": 0.855, "label": "Zeer kansrijk", "nr": 76}, {"lat": 51.28711, "lon": 6.016273, "score": 0.854, "label": "Zeer kansrijk", "nr": 77}, {"lat": 51.290479, "lon": 6.05611, "score": 0.853, "label": "Zeer kansrijk", "nr": 78}, {"lat": 51.258813, "lon": 6.013043, "score": 0.853, "label": "Zeer kansrijk", "nr": 79}, {"lat": 51.256118, "lon": 5.993662, "score": 0.853, "label": "Zeer kansrijk", "nr": 80}, {"lat": 51.258813, "lon": 6.022733, "score": 0.852, "label": "Zeer kansrijk", "nr": 81}, {"lat": 51.290479, "lon": 6.009813, "score": 0.852, "label": "Zeer kansrijk", "nr": 82}, {"lat": 51.264203, "lon": 6.031346, "score": 0.852, "label": "Zeer kansrijk", "nr": 83}, {"lat": 51.258139, "lon": 6.022733, "score": 0.851, "label": "Zeer kansrijk", "nr": 84}, {"lat": 51.264203, "lon": 6.029193, "score": 0.851, "label": "Zeer kansrijk", "nr": 85}, {"lat": 51.270267, "lon": 6.013043, "score": 0.851, "label": "Zeer kansrijk", "nr": 86}, {"lat": 51.260161, "lon": 6.025963, "score": 0.85, "label": "Zeer kansrijk", "nr": 87}, {"lat": 51.260161, "lon": 6.02704, "score": 0.849, "label": "Zeer kansrijk", "nr": 88}, {"lat": 51.270267, "lon": 6.015196, "score": 0.849, "label": "Zeer kansrijk", "nr": 89}, {"lat": 51.272288, "lon": 6.038883, "score": 0.849, "label": "Zeer kansrijk", "nr": 90}, {"lat": 51.262856, "lon": 6.022733, "score": 0.849, "label": "Zeer kansrijk", "nr": 91}, {"lat": 51.291152, "lon": 5.987202, "score": 0.849, "label": "Zeer kansrijk", "nr": 92}, {"lat": 51.293174, "lon": 5.987202, "score": 0.849, "label": "Zeer kansrijk", "nr": 93}, {"lat": 51.271614, "lon": 5.994739, "score": 0.848, "label": "Zeer kansrijk", "nr": 94}, {"lat": 51.272288, "lon": 6.020579, "score": 0.847, "label": "Zeer kansrijk", "nr": 95}, {"lat": 51.289805, "lon": 6.009813, "score": 0.847, "label": "Zeer kansrijk", "nr": 96}, {"lat": 51.272962, "lon": 6.010889, "score": 0.847, "label": "Zeer kansrijk", "nr": 97}, {"lat": 51.271614, "lon": 6.018426, "score": 0.846, "label": "Zeer kansrijk", "nr": 98}, {"lat": 51.263529, "lon": 6.03027, "score": 0.846, "label": "Zeer kansrijk", "nr": 99}, {"lat": 51.264877, "lon": 6.025963, "score": 0.846, "label": "Zeer kansrijk", "nr": 100}];
+var VOORSPELLINGEN = [{"lat": 51.260834, "lon": 6.013043, "score": 0.943, "label": "Zeer kansrijk", "nr": 1}, {"lat": 51.261508, "lon": 6.020579, "score": 0.934, "label": "Zeer kansrijk", "nr": 2}, {"lat": 51.260161, "lon": 6.011966, "score": 0.917, "label": "Zeer kansrijk", "nr": 3}, {"lat": 51.261508, "lon": 6.02704, "score": 0.913, "label": "Zeer kansrijk", "nr": 4}, {"lat": 51.264877, "lon": 6.023809, "score": 0.911, "label": "Zeer kansrijk", "nr": 5}, {"lat": 51.260834, "lon": 6.015196, "score": 0.902, "label": "Zeer kansrijk", "nr": 6}, {"lat": 51.260834, "lon": 6.014119, "score": 0.902, "label": "Zeer kansrijk", "nr": 7}, {"lat": 51.262182, "lon": 6.021656, "score": 0.902, "label": "Zeer kansrijk", "nr": 8}, {"lat": 51.285763, "lon": 5.992586, "score": 0.897, "label": "Zeer kansrijk", "nr": 9}, {"lat": 51.260834, "lon": 6.018426, "score": 0.896, "label": "Zeer kansrijk", "nr": 10}, {"lat": 51.287784, "lon": 5.988279, "score": 0.896, "label": "Zeer kansrijk", "nr": 11}, {"lat": 51.287784, "lon": 5.987202, "score": 0.894, "label": "Zeer kansrijk", "nr": 12}, {"lat": 51.290479, "lon": 6.008736, "score": 0.894, "label": "Zeer kansrijk", "nr": 13}, {"lat": 51.261508, "lon": 6.021656, "score": 0.89, "label": "Zeer kansrijk", "nr": 14}, {"lat": 51.290479, "lon": 5.986126, "score": 0.881, "label": "Zeer kansrijk", "nr": 15}, {"lat": 51.259487, "lon": 6.011966, "score": 0.881, "label": "Zeer kansrijk", "nr": 16}, {"lat": 51.285089, "lon": 5.990432, "score": 0.881, "label": "Zeer kansrijk", "nr": 17}, {"lat": 51.285089, "lon": 5.991509, "score": 0.881, "label": "Zeer kansrijk", "nr": 18}, {"lat": 51.28711, "lon": 5.989356, "score": 0.879, "label": "Zeer kansrijk", "nr": 19}, {"lat": 51.260834, "lon": 6.025963, "score": 0.879, "label": "Zeer kansrijk", "nr": 20}, {"lat": 51.285763, "lon": 5.990432, "score": 0.877, "label": "Zeer kansrijk", "nr": 21}, {"lat": 51.264203, "lon": 6.032423, "score": 0.877, "label": "Zeer kansrijk", "nr": 22}, {"lat": 51.260834, "lon": 6.016273, "score": 0.876, "label": "Zeer kansrijk", "nr": 23}, {"lat": 51.258813, "lon": 6.02704, "score": 0.872, "label": "Zeer kansrijk", "nr": 24}, {"lat": 51.258139, "lon": 6.024886, "score": 0.87, "label": "Zeer kansrijk", "nr": 25}, {"lat": 51.264203, "lon": 6.023809, "score": 0.869, "label": "Zeer kansrijk", "nr": 26}, {"lat": 51.260834, "lon": 6.024886, "score": 0.868, "label": "Zeer kansrijk", "nr": 27}, {"lat": 51.260834, "lon": 6.020579, "score": 0.868, "label": "Zeer kansrijk", "nr": 28}, {"lat": 51.260161, "lon": 6.024886, "score": 0.867, "label": "Zeer kansrijk", "nr": 29}, {"lat": 51.275657, "lon": 6.045343, "score": 0.867, "label": "Zeer kansrijk", "nr": 30}, {"lat": 51.283068, "lon": 5.985049, "score": 0.866, "label": "Zeer kansrijk", "nr": 31}, {"lat": 51.290479, "lon": 5.985049, "score": 0.863, "label": "Zeer kansrijk", "nr": 32}, {"lat": 51.291152, "lon": 5.985049, "score": 0.863, "label": "Zeer kansrijk", "nr": 33}, {"lat": 51.275657, "lon": 6.04642, "score": 0.862, "label": "Zeer kansrijk", "nr": 34}, {"lat": 51.286436, "lon": 5.991509, "score": 0.858, "label": "Zeer kansrijk", "nr": 35}, {"lat": 51.289131, "lon": 6.06903, "score": 0.856, "label": "Zeer kansrijk", "nr": 36}, {"lat": 51.282394, "lon": 5.985049, "score": 0.855, "label": "Zeer kansrijk", "nr": 37}, {"lat": 51.284415, "lon": 5.985049, "score": 0.855, "label": "Zeer kansrijk", "nr": 38}, {"lat": 51.28711, "lon": 6.016273, "score": 0.854, "label": "Zeer kansrijk", "nr": 39}, {"lat": 51.258813, "lon": 6.022733, "score": 0.852, "label": "Zeer kansrijk", "nr": 40}, {"lat": 51.290479, "lon": 6.009813, "score": 0.852, "label": "Zeer kansrijk", "nr": 41}, {"lat": 51.264203, "lon": 6.031346, "score": 0.852, "label": "Zeer kansrijk", "nr": 42}, {"lat": 51.258139, "lon": 6.022733, "score": 0.851, "label": "Zeer kansrijk", "nr": 43}, {"lat": 51.264203, "lon": 6.029193, "score": 0.851, "label": "Zeer kansrijk", "nr": 44}, {"lat": 51.260161, "lon": 6.025963, "score": 0.85, "label": "Zeer kansrijk", "nr": 45}, {"lat": 51.260161, "lon": 6.02704, "score": 0.849, "label": "Zeer kansrijk", "nr": 46}, {"lat": 51.272288, "lon": 6.038883, "score": 0.849, "label": "Zeer kansrijk", "nr": 47}, {"lat": 51.262856, "lon": 6.022733, "score": 0.849, "label": "Zeer kansrijk", "nr": 48}, {"lat": 51.291152, "lon": 5.987202, "score": 0.849, "label": "Zeer kansrijk", "nr": 49}, {"lat": 51.293174, "lon": 5.987202, "score": 0.849, "label": "Zeer kansrijk", "nr": 50}, {"lat": 51.289805, "lon": 6.009813, "score": 0.847, "label": "Zeer kansrijk", "nr": 51}, {"lat": 51.263529, "lon": 6.03027, "score": 0.846, "label": "Zeer kansrijk", "nr": 52}, {"lat": 51.250055, "lon": 6.045343, "score": 0.844, "label": "Zeer kansrijk", "nr": 53}, {"lat": 51.285089, "lon": 5.994739, "score": 0.843, "label": "Zeer kansrijk", "nr": 54}, {"lat": 51.284415, "lon": 5.995816, "score": 0.843, "label": "Zeer kansrijk", "nr": 55}, {"lat": 51.274983, "lon": 6.05288, "score": 0.842, "label": "Zeer kansrijk", "nr": 56}, {"lat": 51.263529, "lon": 6.032423, "score": 0.842, "label": "Zeer kansrijk", "nr": 57}, {"lat": 51.27633, "lon": 6.045343, "score": 0.842, "label": "Zeer kansrijk", "nr": 58}, {"lat": 51.251402, "lon": 6.045343, "score": 0.842, "label": "Zeer kansrijk", "nr": 59}, {"lat": 51.284415, "lon": 5.991509, "score": 0.842, "label": "Zeer kansrijk", "nr": 60}, {"lat": 51.28711, "lon": 5.993662, "score": 0.841, "label": "Zeer kansrijk", "nr": 61}, {"lat": 51.290479, "lon": 5.987202, "score": 0.841, "label": "Zeer kansrijk", "nr": 62}, {"lat": 51.27633, "lon": 6.04965, "score": 0.84, "label": "Zeer kansrijk", "nr": 63}, {"lat": 51.268919, "lon": 6.0335, "score": 0.84, "label": "Zeer kansrijk", "nr": 64}, {"lat": 51.258813, "lon": 6.023809, "score": 0.84, "label": "Zeer kansrijk", "nr": 65}, {"lat": 51.288457, "lon": 6.067953, "score": 0.839, "label": "Zeer kansrijk", "nr": 66}, {"lat": 51.275657, "lon": 6.048573, "score": 0.838, "label": "Zeer kansrijk", "nr": 67}, {"lat": 51.253423, "lon": 6.048573, "score": 0.837, "label": "Zeer kansrijk", "nr": 68}, {"lat": 51.28711, "lon": 5.994739, "score": 0.837, "label": "Zeer kansrijk", "nr": 69}, {"lat": 51.260834, "lon": 6.019503, "score": 0.837, "label": "Zeer kansrijk", "nr": 70}, {"lat": 51.287784, "lon": 6.066877, "score": 0.837, "label": "Zeer kansrijk", "nr": 71}, {"lat": 51.287784, "lon": 6.067953, "score": 0.837, "label": "Zeer kansrijk", "nr": 72}, {"lat": 51.258813, "lon": 6.025963, "score": 0.837, "label": "Zeer kansrijk", "nr": 73}, {"lat": 51.260161, "lon": 6.013043, "score": 0.837, "label": "Zeer kansrijk", "nr": 74}, {"lat": 51.261508, "lon": 6.028116, "score": 0.836, "label": "Zeer kansrijk", "nr": 75}, {"lat": 51.259487, "lon": 6.024886, "score": 0.836, "label": "Zeer kansrijk", "nr": 76}, {"lat": 51.288457, "lon": 6.008736, "score": 0.836, "label": "Zeer kansrijk", "nr": 77}, {"lat": 51.28711, "lon": 5.990432, "score": 0.835, "label": "Zeer kansrijk", "nr": 78}, {"lat": 51.284415, "lon": 5.992586, "score": 0.835, "label": "Zeer kansrijk", "nr": 79}, {"lat": 51.259487, "lon": 6.025963, "score": 0.834, "label": "Zeer kansrijk", "nr": 80}, {"lat": 51.264203, "lon": 6.028116, "score": 0.834, "label": "Zeer kansrijk", "nr": 81}, {"lat": 51.285763, "lon": 5.989356, "score": 0.833, "label": "Zeer kansrijk", "nr": 82}, {"lat": 51.264877, "lon": 6.032423, "score": 0.833, "label": "Zeer kansrijk", "nr": 83}, {"lat": 51.288457, "lon": 5.994739, "score": 0.832, "label": "Zeer kansrijk", "nr": 84}, {"lat": 51.285089, "lon": 5.989356, "score": 0.832, "label": "Zeer kansrijk", "nr": 85}, {"lat": 51.286436, "lon": 5.990432, "score": 0.832, "label": "Zeer kansrijk", "nr": 86}, {"lat": 51.285763, "lon": 6.063647, "score": 0.832, "label": "Zeer kansrijk", "nr": 87}, {"lat": 51.286436, "lon": 6.064723, "score": 0.832, "label": "Zeer kansrijk", "nr": 88}, {"lat": 51.28172, "lon": 5.985049, "score": 0.831, "label": "Zeer kansrijk", "nr": 89}, {"lat": 51.273635, "lon": 6.048573, "score": 0.83, "label": "Zeer kansrijk", "nr": 90}, {"lat": 51.284415, "lon": 5.990432, "score": 0.83, "label": "Zeer kansrijk", "nr": 91}, {"lat": 51.255445, "lon": 6.019503, "score": 0.829, "label": "Zeer kansrijk", "nr": 92}, {"lat": 51.250728, "lon": 6.044266, "score": 0.829, "label": "Zeer kansrijk", "nr": 93}, {"lat": 51.282394, "lon": 6.001199, "score": 0.829, "label": "Zeer kansrijk", "nr": 94}, {"lat": 51.265551, "lon": 6.035653, "score": 0.828, "label": "Zeer kansrijk", "nr": 95}, {"lat": 51.289131, "lon": 6.010889, "score": 0.828, "label": "Zeer kansrijk", "nr": 96}, {"lat": 51.28172, "lon": 6.002276, "score": 0.828, "label": "Zeer kansrijk", "nr": 97}, {"lat": 51.256118, "lon": 6.03673, "score": 0.827, "label": "Zeer kansrijk", "nr": 98}, {"lat": 51.265551, "lon": 6.034576, "score": 0.827, "label": "Zeer kansrijk", "nr": 99}, {"lat": 51.286436, "lon": 5.992586, "score": 0.827, "label": "Zeer kansrijk", "nr": 100}];
 
 // Haversine afstandsberekening
 function haversine(lat1, lon1, lat2, lon2) {
@@ -1327,13 +1351,32 @@ function openFeedback() {
 function sluitFeedback() {
   document.getElementById('fbOverlay').classList.remove('open');
   document.getElementById('fbPanel').classList.remove('open');
+  // Reset naar type-keuze voor volgende keer
+  document.getElementById('fbOpties').style.display = '';
+  document.getElementById('fbFotoVraag').style.display = 'none';
+  document.getElementById('fbTitel').textContent = 'Veldwaarneming toevoegen';
+  gekozenType = null;
 }
 
+var FB_KLEUREN = {
+  burcht: '#28a745', wissel: '#2980b9', graafspoor: '#8B4513',
+  haar: '#8e44ad', sporen: '#e67e22', leeg: '#e74c3c',
+  gevonden: '#28a745'
+};
+var FB_LABELS = {
+  burcht: 'Burcht', wissel: 'Wissel', graafspoor: 'Graafspoor',
+  haar: 'Haren', sporen: 'Sporen', leeg: 'Leeg',
+  gevonden: 'Burcht'
+};
+var FB_ICONS = {
+  burcht: '\u2705', wissel: '\ud83d\udc3e', graafspoor: '\u26cf',
+  haar: '\ud83d\udd2c', sporen: '\ud83d\udc40', leeg: '\u274c',
+  gevonden: '\u2705'
+};
+
 function toonFeedbackMarker(fb) {
-  var kleuren = { gevonden: '#28a745', sporen: '#e67e22', leeg: '#e74c3c' };
-  var labels = { gevonden: 'Burcht', sporen: 'Sporen', leeg: 'Leeg' };
-  var icons = { gevonden: '\u2705', sporen: '\ud83d\udc3e', leeg: '\u274c' };
-  var kleur = kleuren[fb.type] || '#999';
+  var type = fb.type === 'gevonden' ? 'burcht' : fb.type;
+  var kleur = FB_KLEUREN[type] || '#999';
 
   var marker = L.circleMarker([fb.lat, fb.lon], {
     radius: 10, fillColor: kleur, fillOpacity: 0.9,
@@ -1341,12 +1384,14 @@ function toonFeedbackMarker(fb) {
   }).addTo(feedbackMarkers);
 
   var datum = fb.datum ? new Date(fb.datum).toLocaleDateString('nl-NL') : 'onbekend';
-  marker.bindPopup(
-    '<b>' + icons[fb.type] + ' ' + (labels[fb.type] || fb.type) + '</b><br>' +
+  var popupHtml = '<b>' + (FB_ICONS[type]||'') + ' ' + (FB_LABELS[type] || type) + '</b><br>' +
     'Datum: ' + datum + '<br>' +
-    fb.lat.toFixed(5) + ', ' + fb.lon.toFixed(5) +
-    (fb.opmerking ? '<br><i>' + fb.opmerking + '</i>' : '')
-  );
+    fb.lat.toFixed(5) + ', ' + fb.lon.toFixed(5);
+  if (fb.foto) {
+    popupHtml += '<br><img src="' + fb.foto + '" style="width:180px;border-radius:6px;margin-top:6px;cursor:pointer" onclick="toonFotoPreview(this.src, ' + fb.lat + ', ' + fb.lon + ')">';
+  }
+  if (fb.opmerking) popupHtml += '<br><i>' + fb.opmerking + '</i>';
+  marker.bindPopup(popupHtml);
 }
 
 function toonToast(tekst) {
@@ -1356,7 +1401,163 @@ function toonToast(tekst) {
   setTimeout(function() { toast.classList.remove('show'); }, 3000);
 }
 
-function verzendFeedback(type) {
+var gekozenType = null;
+
+function kiesType(type) {
+  gekozenType = type;
+  // Verberg opties, toon foto-vraag
+  document.getElementById('fbOpties').style.display = 'none';
+  document.getElementById('fbFotoVraag').style.display = 'block';
+  document.getElementById('fbTitel').textContent =
+    (FB_ICONS[type]||'') + ' ' + (FB_LABELS[type] || type) + ' — foto?';
+  if (type === 'leeg') {
+    document.getElementById('fbFotoTekst').textContent = 'Wil je een foto maken van de locatie?';
+  } else {
+    document.getElementById('fbFotoTekst').textContent = 'Wil je een foto maken van de waarneming?';
+  }
+}
+
+function fotoNaType() {
+  // Open camera — na foto wordt feedback opgeslagen
+  document.getElementById('fbCameraInput').click();
+}
+
+function slaOpZonderFoto() {
+  // Opslaan zonder foto
+  voltooiFeedback(gekozenType, null);
+}
+
+// EXIF GPS parser — leest GPS uit JPEG
+function leesExifGps(file, callback) {
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var buf = new Uint8Array(e.target.result);
+    var gps = parseExifGps(buf);
+    callback(gps);
+  };
+  reader.readAsArrayBuffer(file.slice(0, 131072)); // eerste 128KB
+}
+
+function parseExifGps(buf) {
+  // Zoek EXIF APP1 marker (0xFFE1)
+  if (buf[0] !== 0xFF || buf[1] !== 0xD8) return null; // geen JPEG
+  var offset = 2;
+  while (offset < buf.length - 4) {
+    if (buf[offset] !== 0xFF) return null;
+    var marker = buf[offset + 1];
+    var len = (buf[offset + 2] << 8) | buf[offset + 3];
+    if (marker === 0xE1) {
+      // APP1 gevonden — check "Exif  "
+      if (buf[offset+4]===0x45 && buf[offset+5]===0x78 &&
+          buf[offset+6]===0x69 && buf[offset+7]===0x66) {
+        return parseIFD(buf, offset + 10, offset + 10);
+      }
+    }
+    offset += 2 + len;
+  }
+  return null;
+}
+
+function parseIFD(buf, tiffStart, ifdOffset) {
+  // Byte order
+  var le = buf[tiffStart] === 0x49; // II = little endian
+  function u16(o) {
+    return le ? (buf[o] | (buf[o+1]<<8)) : ((buf[o]<<8) | buf[o+1]);
+  }
+  function u32(o) {
+    return le ? (buf[o]|(buf[o+1]<<8)|(buf[o+2]<<16)|(buf[o+3]<<24))>>>0
+             : ((buf[o]<<24)|(buf[o+1]<<16)|(buf[o+2]<<8)|buf[o+3])>>>0;
+  }
+  function rational(o) {
+    var num = u32(o), den = u32(o+4);
+    return den ? num/den : 0;
+  }
+
+  // Zoek GPS IFD pointer in IFD0
+  var firstIfd = tiffStart + u32(tiffStart + 4);
+  var nEntries = u16(firstIfd);
+  var gpsIfdOffset = 0;
+  for (var i = 0; i < nEntries; i++) {
+    var entryOff = firstIfd + 2 + i * 12;
+    var tag = u16(entryOff);
+    if (tag === 0x8825) { // GPSInfoIFDPointer
+      gpsIfdOffset = tiffStart + u32(entryOff + 8);
+      break;
+    }
+  }
+  if (!gpsIfdOffset) return null;
+
+  // Lees GPS IFD
+  var gpsEntries = u16(gpsIfdOffset);
+  var latRef = 'N', lonRef = 'E';
+  var latVals = null, lonVals = null;
+  for (var i = 0; i < gpsEntries; i++) {
+    var eo = gpsIfdOffset + 2 + i * 12;
+    var tag = u16(eo);
+    var valOff = tiffStart + u32(eo + 8);
+    if (tag === 1) latRef = String.fromCharCode(buf[eo + 8]); // GPSLatitudeRef
+    if (tag === 3) lonRef = String.fromCharCode(buf[eo + 8]); // GPSLongitudeRef
+    if (tag === 2) latVals = [rational(valOff), rational(valOff+8), rational(valOff+16)];
+    if (tag === 4) lonVals = [rational(valOff), rational(valOff+8), rational(valOff+16)];
+  }
+
+  if (!latVals || !lonVals) return null;
+  var lat = latVals[0] + latVals[1]/60 + latVals[2]/3600;
+  var lon = lonVals[0] + lonVals[1]/60 + lonVals[2]/3600;
+  if (latRef === 'S') lat = -lat;
+  if (lonRef === 'W') lon = -lon;
+  // Validatie: coordinaten moeten redelijk zijn
+  if (lat === 0 && lon === 0) return null;
+  if (lat < -90 || lat > 90 || lon < -180 || lon > 180) return null;
+  return { lat: lat, lon: lon };
+}
+
+// Camera-input voor feedback-foto (na type-keuze)
+document.getElementById('fbCameraInput').addEventListener('change', function(e) {
+  var file = e.target.files[0];
+  if (!file) { slaOpZonderFoto(); return; }
+
+  // Probeer EXIF GPS te lezen
+  leesExifGps(file, function(exifGps) {
+    // Verkleinde versie opslaan (max 800px breed, JPEG 70%)
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      var img = new Image();
+      img.onload = function() {
+        var maxW = 800, maxH = 800;
+        var w = img.width, h = img.height;
+        if (w > maxW) { h = h * maxW / w; w = maxW; }
+        if (h > maxH) { w = w * maxH / h; h = maxH; }
+
+        var canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        var dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+
+        // Als EXIF GPS gevonden, gebruik die (nauwkeuriger)
+        var fotoLat = feedbackLat, fotoLon = feedbackLon;
+        var gpsBron = 'GPS';
+        if (exifGps) {
+          fotoLat = exifGps.lat;
+          fotoLon = exifGps.lon;
+          gpsBron = 'EXIF';
+          // Update ook feedbackLat/Lon voor de waarneming
+          feedbackLat = exifGps.lat;
+          feedbackLon = exifGps.lon;
+        }
+
+        voltooiFeedback(gekozenType, dataUrl);
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  e.target.value = '';
+});
+
+function voltooiFeedback(type, fotoDataUrl) {
   sluitFeedback();
 
   var fb = {
@@ -1364,7 +1565,8 @@ function verzendFeedback(type) {
     lon: feedbackLon,
     type: type,
     datum: new Date().toISOString(),
-    opmerking: ''
+    opmerking: '',
+    foto: fotoDataUrl || null
   };
 
   // Sla lokaal op
@@ -1372,7 +1574,15 @@ function verzendFeedback(type) {
     var saved = JSON.parse(localStorage.getItem('predict_feedback') || '[]');
     saved.push(fb);
     localStorage.setItem('predict_feedback', JSON.stringify(saved));
-  } catch(e) {}
+  } catch(e) {
+    // localStorage vol — verwijder oudste
+    try {
+      var saved2 = JSON.parse(localStorage.getItem('predict_feedback') || '[]');
+      if (saved2.length > 0) saved2.shift();
+      saved2.push(fb);
+      localStorage.setItem('predict_feedback', JSON.stringify(saved2));
+    } catch(e2) {}
+  }
 
   // Toon marker op kaart
   toonFeedbackMarker(fb);
@@ -1385,8 +1595,9 @@ function verzendFeedback(type) {
     xhr.send(JSON.stringify(fb));
   } catch(e) {}
 
-  var labels = { gevonden: 'Burcht gevonden', sporen: 'Sporen gemarkeerd', leeg: 'Leeg gemarkeerd' };
-  toonToast(labels[type] || 'Opgeslagen');
+  var toastTekst = (FB_ICONS[type]||'') + ' ' + (FB_LABELS[type]||type);
+  if (fotoDataUrl) toastTekst += ' + foto';
+  toonToast(toastTekst + ' opgeslagen');
 }
 
 // === Export-systeem ===
@@ -1400,24 +1611,29 @@ function maakExportTekst() {
   var fotos = getFotoData();
   if (data.length === 0 && fotos.length === 0) return null;
 
-  var labels = { gevonden: 'BURCHT GEVONDEN', sporen: 'SPOREN GEZIEN', leeg: 'NIETS GEVONDEN' };
+  var exLabels = {
+    burcht: 'BURCHT GEVONDEN', wissel: 'DASSENPAD/WISSEL', graafspoor: 'GRAAFSPOREN',
+    haar: 'HAREN GEVONDEN', sporen: 'OVERIGE SPOREN', leeg: 'NIETS GEVONDEN',
+    gevonden: 'BURCHT GEVONDEN'
+  };
   var regels = ['=== Predict Veldwaarnemingen ===', 'Datum export: ' + new Date().toLocaleString('nl-NL'), ''];
 
   if (data.length > 0) {
     regels.push('--- Waarnemingen ---');
     data.forEach(function(fb, i) {
       var d = fb.datum ? new Date(fb.datum).toLocaleString('nl-NL') : 'onbekend';
-      regels.push((i+1) + '. ' + (labels[fb.type] || fb.type));
+      regels.push((i+1) + '. ' + (exLabels[fb.type] || fb.type));
       regels.push('   Locatie: ' + fb.lat.toFixed(6) + ', ' + fb.lon.toFixed(6));
       regels.push('   Datum: ' + d);
       regels.push('   Google Maps: https://www.google.com/maps?q=' + fb.lat.toFixed(6) + ',' + fb.lon.toFixed(6));
+      if (fb.foto) regels.push('   Foto: ja');
       if (fb.opmerking) regels.push('   Opmerking: ' + fb.opmerking);
       regels.push('');
     });
   }
 
   if (fotos.length > 0) {
-    regels.push('--- Foto\'s (' + fotos.length + ') ---');
+    regels.push('--- Losse foto\'s (' + fotos.length + ') ---');
     fotos.forEach(function(f, i) {
       var d = f.datum ? new Date(f.datum).toLocaleString('nl-NL') : 'onbekend';
       regels.push((i+1) + '. Foto ' + d);
@@ -1427,11 +1643,15 @@ function maakExportTekst() {
     });
   }
 
-  var n_gevonden = data.filter(function(f){ return f.type==='gevonden'; }).length;
-  var n_sporen = data.filter(function(f){ return f.type==='sporen'; }).length;
-  var n_leeg = data.filter(function(f){ return f.type==='leeg'; }).length;
+  var telPerType = {};
+  ['burcht','wissel','graafspoor','haar','sporen','leeg','gevonden'].forEach(function(t) {
+    telPerType[t] = data.filter(function(f){ return f.type===t; }).length;
+  });
+  telPerType.burcht += telPerType.gevonden; // backward compat
   regels.push('Totaal: ' + data.length + ' waarnemingen, ' + fotos.length + ' foto\'s');
-  regels.push('  Burchten: ' + n_gevonden + ' | Sporen: ' + n_sporen + ' | Leeg: ' + n_leeg);
+  regels.push('  Burchten: ' + telPerType.burcht + ' | Wissels: ' + telPerType.wissel +
+              ' | Graaf: ' + telPerType.graafspoor + ' | Haar: ' + telPerType.haar +
+              ' | Sporen: ' + telPerType.sporen + ' | Leeg: ' + telPerType.leeg);
 
   return regels.join('\n');
 }
@@ -1447,21 +1667,30 @@ function openExport() {
   var el = document.getElementById('exSamenvatting');
 
   if (data.length === 0 && fotos.length === 0) {
-    el.innerHTML = '<p style="color:#999">Nog geen waarnemingen of foto\'s opgeslagen.<br>Gebruik de <b>+</b> knop voor waarnemingen of <b>&#128247;</b> voor foto\'s.</p>';
+    el.innerHTML = '<p style="color:#999">Nog geen waarnemingen opgeslagen.<br>Gebruik de <b>+</b> knop voor waarnemingen.</p>';
   } else {
-    var labels = { gevonden: '&#9989; Burcht', sporen: '&#128062; Sporen', leeg: '&#10060; Leeg' };
+    var exHtmlLabels = {
+      burcht: '&#9989; Burcht', wissel: '&#128062; Wissel', graafspoor: '&#9935; Graafspoor',
+      haar: '&#128300; Haren', sporen: '&#128064; Sporen', leeg: '&#10060; Leeg',
+      gevonden: '&#9989; Burcht'
+    };
     var html = '';
     if (data.length > 0) {
       html += '<b>' + data.length + ' waarneming' + (data.length > 1 ? 'en' : '') + ':</b><br>';
       data.forEach(function(fb) {
         var d = fb.datum ? new Date(fb.datum).toLocaleString('nl-NL', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
-        html += '<div class="fb-regel">' + (labels[fb.type] || fb.type) +
+        var fotoThumb = '';
+        if (fb.foto) {
+          fotoThumb = '<img class="fb-foto" src="' + fb.foto + '" onclick="toonFotoPreview(this.src, ' + fb.lat + ', ' + fb.lon + ')">';
+        }
+        html += '<div class="fb-regel">' + (exHtmlLabels[fb.type] || fb.type) +
                 ' &mdash; ' + d +
-                ' (' + fb.lat.toFixed(4) + ', ' + fb.lon.toFixed(4) + ')</div>';
+                ' (' + fb.lat.toFixed(4) + ', ' + fb.lon.toFixed(4) + ')' +
+                fotoThumb + '</div>';
       });
     }
     if (fotos.length > 0) {
-      html += '<br><b>' + fotos.length + ' foto' + (fotos.length > 1 ? "\'s" : '') + ':</b><br>';
+      html += '<br><b>' + fotos.length + ' losse foto' + (fotos.length > 1 ? "\'s" : '') + ':</b><br>';
       fotos.forEach(function(f) {
         var d = f.datum ? new Date(f.datum).toLocaleString('nl-NL', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
         html += '<div class="fb-regel">' +
