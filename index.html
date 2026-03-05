@@ -73,9 +73,9 @@
     box-shadow: 0 0 4px rgba(0,0,0,0.3);
   }
 
-  /* Navigatie-balk onderaan (boven dichtstbij-bar) */
+  /* Navigatie-balk onderaan */
   .nav-bar {
-    position: absolute; bottom: 50px; left: 10px; right: 10px; z-index: 998;
+    position: absolute; bottom: 10px; left: 10px; right: 10px; z-index: 998;
     background: rgba(255,255,255,0.95); padding: 8px 12px;
     border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.2);
     display: flex; align-items: center; justify-content: space-between;
@@ -209,23 +209,6 @@
   .stats { margin-top: 8px; padding-top: 6px; border-top: 1px solid #eee;
             font-size: 11px; color: #666; }
 
-  /* Dichtsbijzijnde locatie-balk */
-  .dichtstbij-bar {
-    position: absolute; bottom: 0; left: 0; right: 0; z-index: 999;
-    background: rgba(255,255,255,0.95); padding: 10px 14px;
-    display: none; border-top: 2px solid #e67e22;
-    font-size: 13px;
-    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-  }
-  .dichtstbij-bar.active { display: flex; align-items: center;
-                            justify-content: space-between; }
-  .dichtstbij-info { flex: 1; }
-  .dichtstbij-nav {
-    background: #28a745; color: white; border: none;
-    padding: 8px 16px; border-radius: 20px; font-size: 13px;
-    cursor: pointer; font-weight: 600; white-space: nowrap;
-  }
-
   /* User marker */
   .user-marker {
     width: 16px; height: 16px; background: #2563eb;
@@ -274,7 +257,6 @@
   /* Standalone modus: extra padding voor notch */
   @media (display-mode: standalone) {
     .gps-bar { padding-top: max(8px, env(safe-area-inset-top)); }
-    .dichtstbij-bar { padding-bottom: max(10px, env(safe-area-inset-bottom)); }
     .veld-knoppen { bottom: max(20px, calc(env(safe-area-inset-bottom) + 10px)); }
     .install-banner { display: none !important; }
   }
@@ -413,12 +395,6 @@
     <div>Sync naar PC<br><small style="color:#888">Start sync server op PC (control panel)</small></div>
   </div>
   <button class="feedback-sluiten" onclick="sluitExport()">Sluiten</button>
-</div>
-
-<!-- Dichtstbijzijnde locatie balk -->
-<div class="dichtstbij-bar" id="dichtstbijBar">
-  <div class="dichtstbij-info" id="dichtstbijInfo"></div>
-  <button class="dichtstbij-nav" onclick="navigeerDichtsbij()">Navigeer &#10148;</button>
 </div>
 
 <script>
@@ -1279,30 +1255,15 @@ function updateDichtstbij() {
   });
 
   dichtstbij = minV;
-  var bar = document.getElementById('dichtstbijBar');
-  var info = document.getElementById('dichtstbijInfo');
   var afstand = document.getElementById('gpsAfstand');
 
   if (minV && minDist < 5000) {
     var afstTekst = minDist < 1000
       ? Math.round(minDist) + 'm'
       : (minDist / 1000).toFixed(1) + 'km';
-    info.innerHTML = '<b>#' + minV.nr + ' ' + minV.label + '</b> — ' + afstTekst +
-                     ' (score: ' + minV.score.toFixed(2) + ')';
-    afstand.textContent = 'Dichtstbij: ' + afstTekst;
-    bar.className = 'dichtstbij-bar active';
+    afstand.textContent = 'Dichtstbij #' + minV.nr + ': ' + afstTekst;
   } else {
-    bar.className = 'dichtstbij-bar';
     afstand.textContent = '';
-  }
-}
-
-function navigeerDichtsbij() {
-  if (dichtstbij) {
-    window.open('https://www.google.com/maps/dir/' + userLat + ',' + userLon +
-                '/' + dichtstbij.lat + ',' + dichtstbij.lon +
-                '/@' + dichtstbij.lat + ',' + dichtstbij.lon + ',15z/data=!3m1!4b1!4m2!4m1!3e2',
-                '_blank');
   }
 }
 
