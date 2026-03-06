@@ -459,12 +459,36 @@ window.onerror = function(msg, url, line) {
   </div>
   <div class="export-actie" onclick="syncNaarPC()" style="border-color:#2980b9">
     <span class="ea-icon">&#128260;</span>
-    <div>Sync naar PC<br><small style="color:#888">Start sync server op PC (control panel)</small></div>
+    <div>Sync naar PC<br><small style="color:#888" id="syncIpLabel"></small></div>
+  </div>
+  <div class="export-actie" onclick="wijzigSyncIp()" style="border-color:#95a5a6;padding:8px 12px">
+    <span class="ea-icon" style="font-size:16px">&#9881;</span>
+    <div style="font-size:13px">Sync IP wijzigen<br><small style="color:#888">Scan QR of voer IP handmatig in</small></div>
   </div>
   <button class="feedback-sluiten" onclick="sluitExport()">Sluiten</button>
 </div>
 
 <script>
+// === Sync IP uit QR-code URL parameter ===
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var syncIp = params.get('sync_ip');
+  if (syncIp) {
+    localStorage.setItem('predict_sync_ip', syncIp);
+    // Verwijder parameter uit URL (schone URL)
+    var cleanUrl = window.location.origin + window.location.pathname + window.location.hash;
+    window.history.replaceState(null, '', cleanUrl);
+    // Toon bevestiging na korte vertraging (pagina moet eerst laden)
+    setTimeout(function() {
+      if (typeof toonToast === 'function') {
+        toonToast('Sync IP opgeslagen: ' + syncIp, 4000);
+      } else {
+        alert('Sync IP opgeslagen: ' + syncIp);
+      }
+    }, 1500);
+  }
+})();
+
 var map = L.map('map', {zoomControl: false}).setView([51.259612613672765, 6.019306823112128], 14);
 
 L.control.zoom({position: 'bottomleft'}).addTo(map);
@@ -3266,6 +3290,38 @@ function exportKopieer() {
   }
 }
 
+// === Sync IP beheer ===
+function updateSyncIpLabel() {
+  var el = document.getElementById('syncIpLabel');
+  if (!el) return;
+  var ip = localStorage.getItem('predict_sync_ip');
+  el.textContent = ip ? 'Verbonden: ' + ip : 'Start sync server op PC (control panel)';
+}
+// Update label bij openen export
+var _origOpenExport = openExport;
+openExport = function() { _origOpenExport(); updateSyncIpLabel(); };
+
+function wijzigSyncIp() {
+  var huidig = localStorage.getItem('predict_sync_ip') || '';
+  var nieuw = prompt(
+    'Sync IP wijzigen\n\n' +
+    'Huidig: ' + (huidig || '(niet ingesteld)') + '\n\n' +
+    'Scan de QR-code op het PC-scherm, of\n' +
+    'voer het IP-adres handmatig in.\n\n' +
+    'Leeg laten = verwijderen',
+    huidig
+  );
+  if (nieuw === null) return; // geannuleerd
+  if (nieuw.trim() === '') {
+    localStorage.removeItem('predict_sync_ip');
+    toonToast('Sync IP verwijderd');
+  } else {
+    localStorage.setItem('predict_sync_ip', nieuw.trim());
+    toonToast('Sync IP opgeslagen: ' + nieuw.trim());
+  }
+  updateSyncIpLabel();
+}
+
 // === Sync naar PC ===
 function syncNaarPC() {
   sluitExport();
@@ -3316,14 +3372,20 @@ function syncNaarPC() {
   } else {
     // Op GitHub Pages (HTTPS): redirect-methode
     // fetch() naar HTTP is geblokkeerd, maar navigatie niet
-    var syncIp = prompt(
-      'Sync naar PC\n\n' +
-      'Voer het IP-adres van je PC in (zie control panel).\n' +
-      'Voorbeeld: 192.168.1.100',
-      localStorage.getItem('predict_sync_ip') || ''
-    );
-    if (!syncIp) return;
-    localStorage.setItem('predict_sync_ip', syncIp);
+    var syncIp = localStorage.getItem('predict_sync_ip');
+
+    if (!syncIp) {
+      // Geen IP opgeslagen — vraag handmatig
+      syncIp = prompt(
+        'Sync naar PC\n\n' +
+        'Scan de QR-code op het PC-scherm, of\n' +
+        'voer het IP-adres handmatig in.\n' +
+        'Voorbeeld: 192.168.1.100',
+        ''
+      );
+      if (!syncIp) return;
+      localStorage.setItem('predict_sync_ip', syncIp);
+    }
 
     // Encodeer data in URL en navigeer (geen fetch nodig)
     var syncData = JSON.stringify({ feedback: fb, fotos: fotos });
@@ -3331,7 +3393,7 @@ function syncNaarPC() {
     var syncUrl = 'http://' + syncIp + ':8765/sync/receive?data=' + encodeURIComponent(encoded);
 
     // Open in nieuw tabblad zodat deze pagina open blijft
-    toonToast('Sync openen in nieuw tabblad...');
+    toonToast('Sync naar ' + syncIp + '...');
     window.open(syncUrl, '_blank');
   }
 }
