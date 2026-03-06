@@ -7,6 +7,7 @@
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-rotate@0.2.8/dist/leaflet-rotate.js"></script>
 <style>
   * { box-sizing: border-box; }
   body { margin: 0; padding: 0; font-family: -apple-system, 'Segoe UI', sans-serif; }
@@ -489,7 +490,7 @@ window.onerror = function(msg, url, line) {
   }
 })();
 
-var map = L.map('map', {zoomControl: false}).setView([51.259612613672765, 6.019306823112128], 14);
+var map = L.map('map', {zoomControl: false, rotate: true, bearing: 0}).setView([51.259612613672765, 6.019306823112128], 14);
 
 L.control.zoom({position: 'bottomleft'}).addTo(map);
 
@@ -2258,8 +2259,11 @@ function startMeten() {
 function stopMeten() {
   meetActief = false;
   document.getElementById('btnMeten').style.background = '#2c3e50';
-  document.getElementById('meetBalk').classList.remove('active');
   document.getElementById('map').style.cursor = '';
+  // Meetbalk blijft zichtbaar als er een meting is
+  if (meetPunten.length === 0) {
+    document.getElementById('meetBalk').classList.remove('active');
+  }
 }
 
 function wisMeting() {
@@ -2271,6 +2275,10 @@ function wisMeting() {
   meetPunten = [];
   document.getElementById('meetAfstand').textContent = '0 m';
   document.getElementById('meetSegmenten').textContent = '';
+  // Verberg meetbalk als meet-modus niet actief
+  if (!meetActief) {
+    document.getElementById('meetBalk').classList.remove('active');
+  }
 }
 
 function meetKlik(e) {
@@ -2323,13 +2331,18 @@ function formatAfstand(m) {
   return (m / 1000).toFixed(2) + ' km';
 }
 
-// === Kompas-rotatie ===
+// === Kompas-rotatie (leaflet-rotate plugin) ===
 var kompasActief = false;
 var kompasHeading = 0;
 var kompasPermissie = false;
 var kompasOrientationHandler = null;
 
 function checkKompasBeschikbaar() {
+  // Controleer of leaflet-rotate plugin geladen is
+  if (typeof map.setBearing !== 'function') {
+    console.log('leaflet-rotate niet beschikbaar, kompas uitgeschakeld');
+    return;
+  }
   if (typeof DeviceOrientationEvent !== 'undefined' &&
       typeof DeviceOrientationEvent.requestPermission === 'function') {
     document.getElementById('btnKompas').style.display = 'flex';
@@ -2368,11 +2381,22 @@ function startKompas() {
       heading = 360 - event.alpha;
     }
     if (heading !== null && !isNaN(heading)) {
-      kompasHeading = heading;
-      updateKompasRotatie();
+      // Smooth de heading (voorkom trillen)
+      var verschil = heading - kompasHeading;
+      if (verschil > 180) verschil -= 360;
+      if (verschil < -180) verschil += 360;
+      kompasHeading += verschil * 0.15;
+      if (kompasHeading < 0) kompasHeading += 360;
+      if (kompasHeading >= 360) kompasHeading -= 360;
+      // Roteer kaart via leaflet-rotate (alleen tiles/markers draaien, UI blijft recht)
+      map.setBearing(kompasHeading);
+      // Kompas-indicator draait mee (noord-pijl wijst naar noorden)
+      var svg = document.querySelector('#kompasIndicator svg');
+      if (svg) svg.style.transform = 'rotate(' + kompasHeading + 'deg)';
     }
   };
   window.addEventListener('deviceorientation', kompasOrientationHandler, true);
+  toonToast('Kompas aan — kaart volgt richting');
 }
 
 function stopKompas() {
@@ -2383,48 +2407,12 @@ function stopKompas() {
     window.removeEventListener('deviceorientation', kompasOrientationHandler, true);
     kompasOrientationHandler = null;
   }
-  document.getElementById('map').style.transform = '';
-  document.getElementById('map').style.transformOrigin = '';
-  resetCounterRotatie();
-}
-
-function updateKompasRotatie() {
-  if (!kompasActief) return;
-  var hoek = -kompasHeading;
-  document.getElementById('map').style.transformOrigin = '50% 50%';
-  document.getElementById('map').style.transform = 'rotate(' + hoek + 'deg)';
-  var tegen = kompasHeading;
-  var els = [
-    document.querySelector('.gps-bar'),
-    document.querySelector('.veld-knoppen'),
-    document.querySelector('.nav-bar'),
-    document.querySelector('.info-panel'),
-    document.getElementById('crosshair'),
-    document.querySelector('.leaflet-control-zoom'),
-    document.querySelector('.leaflet-control-layers'),
-    document.getElementById('meetBalk')
-  ];
-  els.forEach(function(el) {
-    if (el) el.style.transform = 'rotate(' + tegen + 'deg)';
-  });
+  // Reset kaart naar noord-omhoog
+  map.setBearing(0);
+  kompasHeading = 0;
   var svg = document.querySelector('#kompasIndicator svg');
-  if (svg) svg.style.transform = 'rotate(' + tegen + 'deg)';
-}
-
-function resetCounterRotatie() {
-  var els = [
-    document.querySelector('.gps-bar'),
-    document.querySelector('.veld-knoppen'),
-    document.querySelector('.nav-bar'),
-    document.querySelector('.info-panel'),
-    document.getElementById('crosshair'),
-    document.querySelector('.leaflet-control-zoom'),
-    document.querySelector('.leaflet-control-layers'),
-    document.getElementById('meetBalk')
-  ];
-  els.forEach(function(el) {
-    if (el) el.style.transform = '';
-  });
+  if (svg) svg.style.transform = '';
+  toonToast('Kompas uit — noord omhoog');
 }
 
 checkKompasBeschikbaar();
