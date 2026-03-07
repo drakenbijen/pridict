@@ -290,8 +290,9 @@ window.onerror = function(msg, url, line) {
   <h3>Predict — Veldkaart</h3>
   <div class="legenda-item">
     <div class="legenda-kleur" style="background:#28a745; border-color:#155724;"></div>
-    Bekende burcht (8)
+    Bekende burcht (7)
   </div>
+  <div class="legenda-item"><div class="legenda-kleur" style="background:#ffc107; border-color:#856404; border-style:dashed;"></div>Onzekere burcht (1)</div>
   <div class="legenda-item">
     <div class="legenda-kleur" style="background:#f39c12; border-color:#e67e22;"></div>
     Te onderzoeken (100)
@@ -547,10 +548,10 @@ var BEKENDE_BURCHTEN = [[51.2498819, 6.022837], [51.255114, 6.02762], [51.256943
           .bindPopup('<b>Bekende burcht #6</b><br>51.26459, 6.02358<br><a href="https://www.google.com/maps/dir/?api=1&destination=51.264592,6.02358&travelmode=driving" target="_blank" style="display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600">Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.261597, 6.02068], {
-            radius: 10, color: '#155724', fillColor: '#28a745',
-            fillOpacity: 0.9, weight: 3
+            radius: 10, color: '#856404', fillColor: '#ffc107',
+            fillOpacity: 0.7, weight: 3, dashArray: '6,4'
         }).addTo(bekendeLayer)
-          .bindPopup('<b>Bekende burcht #7</b><br>51.26160, 6.02068<br><a href="https://www.google.com/maps/dir/?api=1&destination=51.261597,6.02068&travelmode=driving" target="_blank" style="display:inline-block;margin-top:6px;padding:8px 16px;background:#28a745;color:white;border-radius:20px;text-decoration:none;font-weight:600">Navigeer hierheen &#10148;</a>');
+          .bindPopup('<b>Onzekere burcht #7</b><br><span style="color:#856404">Status: niet zeker</span><br>51.26160, 6.02068<br><a href="https://www.google.com/maps/dir/?api=1&destination=51.261597,6.02068&travelmode=driving" target="_blank" style="display:inline-block;margin-top:6px;padding:8px 16px;background:#ffc107;color:#333;border-radius:20px;text-decoration:none;font-weight:600">Navigeer hierheen &#10148;</a>');
         
         L.circleMarker([51.260804, 6.02913], {
             radius: 10, color: '#155724', fillColor: '#28a745',
