@@ -509,7 +509,7 @@ L.control.zoom({position: 'bottomleft'}).addTo(map);
 // Kaarttegels — OpenStreetMap (werkt overal incl. mobiel)
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  attribution: 'Predict v' + PREDICT_VERSIE + ' | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
 
 var bekendeLayer = L.layerGroup().addTo(map);
@@ -935,26 +935,26 @@ var BEKENDE_BURCHTEN = [[51.2498819, 6.022837], [51.255114, 6.02762], [51.256943
         })();
         
         (function() {
-          var m = L.circleMarker([51.253423, 6.020581], {
-              radius: 7, color: '#e67e22', fillColor: '#f39c12',
-              fillOpacity: 0.75, weight: 2
-          });
-          m._predId = 31;
-          m._predLat = 51.253423;
-          m._predLon = 6.020581;
-          m.addTo(voorspelLayer).bindPopup('<b>#31 — Te onderzoeken</b><br>Score: 0.96 | GBIF: 186<br><span style=\'font-size:12px;color:#28a745;font-weight:600\'>&#9679; Betrouwbaar (85%)</span><br>Bos: 3.0m | Gras: 35.0m<br>Water: 234.0m | Bebouwing: 173.0m<br>Helling: 2.8° | Bodem: rivierklei | GW: 100% | Veldbonus: +0.04 (graafspoor)<br><div style=\'display:flex;gap:6px;margin-top:8px\'><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.253423,6.020581&travelmode=driving\' target=\'_blank\' style=\'flex:1;display:inline-block;padding:8px 12px;background:#28a745;color:white;border-radius:10px;text-decoration:none;text-align:center;font-weight:600;font-size:13px\'>Navigeer &#10148;</a><button onclick=\'voorspellingBezocht(51.253423,6.020581)\' style=\'flex:1;padding:8px 12px;background:#3498db;color:white;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-weight:600\'>Bezocht &#9998;</button></div>');
-          voorspelMarkers.push(m);
-        })();
-        
-        (function() {
           var m = L.circleMarker([51.256118, 6.0475], {
               radius: 7, color: '#e67e22', fillColor: '#f39c12',
               fillOpacity: 0.75, weight: 2
           });
-          m._predId = 32;
+          m._predId = 31;
           m._predLat = 51.256118;
           m._predLon = 6.0475;
-          m.addTo(voorspelLayer).bindPopup('<b>#32 — Te onderzoeken</b><br>Score: 0.96 | GBIF: 120<br><span style=\'font-size:12px;color:#f39c12;font-weight:600\'>&#9679; Redelijk (75%)</span><br>Bos: 40.0m | Gras: 40.0m<br>Water: 207.0m | Bebouwing: 390.0m<br>Helling: 3.7° | Bodem: onbekend | GW: 10%<br><div style=\'display:flex;gap:6px;margin-top:8px\'><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.256118,6.0475&travelmode=driving\' target=\'_blank\' style=\'flex:1;display:inline-block;padding:8px 12px;background:#28a745;color:white;border-radius:10px;text-decoration:none;text-align:center;font-weight:600;font-size:13px\'>Navigeer &#10148;</a><button onclick=\'voorspellingBezocht(51.256118,6.0475)\' style=\'flex:1;padding:8px 12px;background:#3498db;color:white;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-weight:600\'>Bezocht &#9998;</button></div>');
+          m.addTo(voorspelLayer).bindPopup('<b>#31 — Te onderzoeken</b><br>Score: 0.96 | GBIF: 120<br><span style=\'font-size:12px;color:#f39c12;font-weight:600\'>&#9679; Redelijk (75%)</span><br>Bos: 40.0m | Gras: 40.0m<br>Water: 207.0m | Bebouwing: 390.0m<br>Helling: 3.7° | Bodem: onbekend | GW: 10%<br><div style=\'display:flex;gap:6px;margin-top:8px\'><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.256118,6.0475&travelmode=driving\' target=\'_blank\' style=\'flex:1;display:inline-block;padding:8px 12px;background:#28a745;color:white;border-radius:10px;text-decoration:none;text-align:center;font-weight:600;font-size:13px\'>Navigeer &#10148;</a><button onclick=\'voorspellingBezocht(51.256118,6.0475)\' style=\'flex:1;padding:8px 12px;background:#3498db;color:white;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-weight:600\'>Bezocht &#9998;</button></div>');
+          voorspelMarkers.push(m);
+        })();
+        
+        (function() {
+          var m = L.circleMarker([51.253423, 6.020581], {
+              radius: 7, color: '#e67e22', fillColor: '#f39c12',
+              fillOpacity: 0.75, weight: 2
+          });
+          m._predId = 32;
+          m._predLat = 51.253423;
+          m._predLon = 6.020581;
+          m.addTo(voorspelLayer).bindPopup('<b>#32 — Te onderzoeken</b><br>Score: 0.95 | GBIF: 186<br><span style=\'font-size:12px;color:#28a745;font-weight:600\'>&#9679; Betrouwbaar (85%)</span><br>Bos: 3.0m | Gras: 35.0m<br>Water: 234.0m | Bebouwing: 173.0m<br>Helling: 2.8° | Bodem: rivierklei | GW: 100% | Veldbonus: +0.04 (graafspoor)<br><div style=\'display:flex;gap:6px;margin-top:8px\'><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.253423,6.020581&travelmode=driving\' target=\'_blank\' style=\'flex:1;display:inline-block;padding:8px 12px;background:#28a745;color:white;border-radius:10px;text-decoration:none;text-align:center;font-weight:600;font-size:13px\'>Navigeer &#10148;</a><button onclick=\'voorspellingBezocht(51.253423,6.020581)\' style=\'flex:1;padding:8px 12px;background:#3498db;color:white;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-weight:600\'>Bezocht &#9998;</button></div>');
           voorspelMarkers.push(m);
         })();
         
@@ -1259,14 +1259,26 @@ var BEKENDE_BURCHTEN = [[51.2498819, 6.022837], [51.255114, 6.02762], [51.256943
         })();
         
         (function() {
-          var m = L.circleMarker([51.272288, 6.069035], {
+          var m = L.circleMarker([51.267572, 6.032425], {
               radius: 7, color: '#e67e22', fillColor: '#f39c12',
               fillOpacity: 0.75, weight: 2
           });
           m._predId = 58;
+          m._predLat = 51.267572;
+          m._predLon = 6.032425;
+          m.addTo(voorspelLayer).bindPopup('<b>#58 — Te onderzoeken</b><br>Score: 0.95 | GBIF: 186<br><span style=\'font-size:12px;color:#28a745;font-weight:600\'>&#9679; Betrouwbaar (85%)</span><br>Bos: 28.0m | Gras: 7.0m<br>Water: 301.0m | Bebouwing: 20.0m<br>Helling: 1.7° | Bodem: onbekend | GW: 40% | Veldbonus: +0.15 (wissel+graafspoor+graafspoor+graafspoor)<br><div style=\'display:flex;gap:6px;margin-top:8px\'><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.267572,6.032425&travelmode=driving\' target=\'_blank\' style=\'flex:1;display:inline-block;padding:8px 12px;background:#28a745;color:white;border-radius:10px;text-decoration:none;text-align:center;font-weight:600;font-size:13px\'>Navigeer &#10148;</a><button onclick=\'voorspellingBezocht(51.267572,6.032425)\' style=\'flex:1;padding:8px 12px;background:#3498db;color:white;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-weight:600\'>Bezocht &#9998;</button></div>');
+          voorspelMarkers.push(m);
+        })();
+        
+        (function() {
+          var m = L.circleMarker([51.272288, 6.069035], {
+              radius: 7, color: '#e67e22', fillColor: '#f39c12',
+              fillOpacity: 0.75, weight: 2
+          });
+          m._predId = 59;
           m._predLat = 51.272288;
           m._predLon = 6.069035;
-          m.addTo(voorspelLayer).bindPopup('<b>#58 — Te onderzoeken</b><br>Score: 0.95 | GBIF: 120<br><span style=\'font-size:12px;color:#f39c12;font-weight:600\'>&#9679; Redelijk (75%)</span><br>Bos: 32.0m | Gras: 32.0m<br>Water: 87.0m | Bebouwing: 116.0m<br>Helling: 0.4° | Bodem: zand | GW: 70%<br><div style=\'display:flex;gap:6px;margin-top:8px\'><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.272288,6.069035&travelmode=driving\' target=\'_blank\' style=\'flex:1;display:inline-block;padding:8px 12px;background:#28a745;color:white;border-radius:10px;text-decoration:none;text-align:center;font-weight:600;font-size:13px\'>Navigeer &#10148;</a><button onclick=\'voorspellingBezocht(51.272288,6.069035)\' style=\'flex:1;padding:8px 12px;background:#3498db;color:white;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-weight:600\'>Bezocht &#9998;</button></div>');
+          m.addTo(voorspelLayer).bindPopup('<b>#59 — Te onderzoeken</b><br>Score: 0.95 | GBIF: 120<br><span style=\'font-size:12px;color:#f39c12;font-weight:600\'>&#9679; Redelijk (75%)</span><br>Bos: 32.0m | Gras: 32.0m<br>Water: 87.0m | Bebouwing: 116.0m<br>Helling: 0.4° | Bodem: zand | GW: 70%<br><div style=\'display:flex;gap:6px;margin-top:8px\'><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.272288,6.069035&travelmode=driving\' target=\'_blank\' style=\'flex:1;display:inline-block;padding:8px 12px;background:#28a745;color:white;border-radius:10px;text-decoration:none;text-align:center;font-weight:600;font-size:13px\'>Navigeer &#10148;</a><button onclick=\'voorspellingBezocht(51.272288,6.069035)\' style=\'flex:1;padding:8px 12px;background:#3498db;color:white;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-weight:600\'>Bezocht &#9998;</button></div>');
           voorspelMarkers.push(m);
         })();
         
@@ -1275,22 +1287,10 @@ var BEKENDE_BURCHTEN = [[51.2498819, 6.022837], [51.255114, 6.02762], [51.256943
               radius: 7, color: '#e67e22', fillColor: '#f39c12',
               fillOpacity: 0.75, weight: 2
           });
-          m._predId = 59;
+          m._predId = 60;
           m._predLat = 51.234559;
           m._predLon = 6.069035;
-          m.addTo(voorspelLayer).bindPopup('<b>#59 — Te onderzoeken</b><br>Score: 0.95 | GBIF: 120<br><span style=\'font-size:12px;color:#f39c12;font-weight:600\'>&#9679; Redelijk (75%)</span><br>Bos: 3.0m | Gras: 3.0m<br>Water: 208.0m | Bebouwing: 91.0m<br>Helling: 0.5° | Bodem: zand | GW: 10%<br><div style=\'display:flex;gap:6px;margin-top:8px\'><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.234559,6.069035&travelmode=driving\' target=\'_blank\' style=\'flex:1;display:inline-block;padding:8px 12px;background:#28a745;color:white;border-radius:10px;text-decoration:none;text-align:center;font-weight:600;font-size:13px\'>Navigeer &#10148;</a><button onclick=\'voorspellingBezocht(51.234559,6.069035)\' style=\'flex:1;padding:8px 12px;background:#3498db;color:white;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-weight:600\'>Bezocht &#9998;</button></div>');
-          voorspelMarkers.push(m);
-        })();
-        
-        (function() {
-          var m = L.circleMarker([51.267572, 6.032425], {
-              radius: 7, color: '#e67e22', fillColor: '#f39c12',
-              fillOpacity: 0.75, weight: 2
-          });
-          m._predId = 60;
-          m._predLat = 51.267572;
-          m._predLon = 6.032425;
-          m.addTo(voorspelLayer).bindPopup('<b>#60 — Te onderzoeken</b><br>Score: 0.95 | GBIF: 186<br><span style=\'font-size:12px;color:#28a745;font-weight:600\'>&#9679; Betrouwbaar (85%)</span><br>Bos: 28.0m | Gras: 7.0m<br>Water: 301.0m | Bebouwing: 20.0m<br>Helling: 1.7° | Bodem: onbekend | GW: 40% | Veldbonus: +0.15 (wissel+graafspoor+graafspoor+graafspoor)<br><div style=\'display:flex;gap:6px;margin-top:8px\'><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.267572,6.032425&travelmode=driving\' target=\'_blank\' style=\'flex:1;display:inline-block;padding:8px 12px;background:#28a745;color:white;border-radius:10px;text-decoration:none;text-align:center;font-weight:600;font-size:13px\'>Navigeer &#10148;</a><button onclick=\'voorspellingBezocht(51.267572,6.032425)\' style=\'flex:1;padding:8px 12px;background:#3498db;color:white;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-weight:600\'>Bezocht &#9998;</button></div>');
+          m.addTo(voorspelLayer).bindPopup('<b>#60 — Te onderzoeken</b><br>Score: 0.95 | GBIF: 120<br><span style=\'font-size:12px;color:#f39c12;font-weight:600\'>&#9679; Redelijk (75%)</span><br>Bos: 3.0m | Gras: 3.0m<br>Water: 208.0m | Bebouwing: 91.0m<br>Helling: 0.5° | Bodem: zand | GW: 10%<br><div style=\'display:flex;gap:6px;margin-top:8px\'><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.234559,6.069035&travelmode=driving\' target=\'_blank\' style=\'flex:1;display:inline-block;padding:8px 12px;background:#28a745;color:white;border-radius:10px;text-decoration:none;text-align:center;font-weight:600;font-size:13px\'>Navigeer &#10148;</a><button onclick=\'voorspellingBezocht(51.234559,6.069035)\' style=\'flex:1;padding:8px 12px;background:#3498db;color:white;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-weight:600\'>Bezocht &#9998;</button></div>');
           voorspelMarkers.push(m);
         })();
         
@@ -2201,7 +2201,7 @@ bounds.extend([51.268245, 6.033502]);
 map.fitBounds(bounds.pad(0.1));
 
 // Voorspellingen data voor afstandsberekening
-var VOORSPELLINGEN = [{"lat": 51.268919, "lon": 6.030272, "score": 0.976, "label": "Te onderzoeken", "nr": 1}, {"lat": 51.264203, "lon": 6.030272, "score": 0.975, "label": "Te onderzoeken", "nr": 2}, {"lat": 51.232538, "lon": 6.021658, "score": 0.973, "label": "Te onderzoeken", "nr": 3}, {"lat": 51.267572, "lon": 6.072266, "score": 0.973, "label": "Te onderzoeken", "nr": 4}, {"lat": 51.269593, "lon": 6.030272, "score": 0.969, "label": "Te onderzoeken", "nr": 5}, {"lat": 51.269593, "lon": 6.031349, "score": 0.968, "label": "Te onderzoeken", "nr": 6}, {"lat": 51.231864, "lon": 6.020581, "score": 0.965, "label": "Te onderzoeken", "nr": 7}, {"lat": 51.268919, "lon": 6.033502, "score": 0.964, "label": "Te onderzoeken", "nr": 8}, {"lat": 51.270267, "lon": 6.073342, "score": 0.963, "label": "Te onderzoeken", "nr": 9}, {"lat": 51.267572, "lon": 6.073342, "score": 0.963, "label": "Te onderzoeken", "nr": 10}, {"lat": 51.250055, "lon": 6.045346, "score": 0.962, "label": "Te onderzoeken", "nr": 11}, {"lat": 51.231864, "lon": 6.021658, "score": 0.962, "label": "Te onderzoeken", "nr": 12}, {"lat": 51.252076, "lon": 6.04427, "score": 0.96, "label": "Te onderzoeken", "nr": 13}, {"lat": 51.250055, "lon": 6.088417, "score": 0.959, "label": "Te onderzoeken", "nr": 14}, {"lat": 51.250055, "lon": 6.04427, "score": 0.959, "label": "Te onderzoeken", "nr": 15}, {"lat": 51.267572, "lon": 6.033502, "score": 0.959, "label": "Te onderzoeken", "nr": 16}, {"lat": 51.24197, "lon": 6.071189, "score": 0.958, "label": "Te onderzoeken", "nr": 17}, {"lat": 51.243317, "lon": 6.072266, "score": 0.958, "label": "Te onderzoeken", "nr": 18}, {"lat": 51.234559, "lon": 6.071189, "score": 0.957, "label": "Te onderzoeken", "nr": 19}, {"lat": 51.268245, "lon": 6.033502, "score": 0.957, "label": "Te onderzoeken", "nr": 20}, {"lat": 51.267572, "lon": 6.074419, "score": 0.957, "label": "Te onderzoeken", "nr": 21}, {"lat": 51.258139, "lon": 6.048577, "score": 0.956, "label": "Te onderzoeken", "nr": 22}, {"lat": 51.251402, "lon": 6.0475, "score": 0.956, "label": "Te onderzoeken", "nr": 23}, {"lat": 51.259487, "lon": 6.046423, "score": 0.956, "label": "Te onderzoeken", "nr": 24}, {"lat": 51.235233, "lon": 6.061498, "score": 0.956, "label": "Te onderzoeken", "nr": 25}, {"lat": 51.253423, "lon": 6.048577, "score": 0.955, "label": "Te onderzoeken", "nr": 26}, {"lat": 51.234559, "lon": 6.061498, "score": 0.955, "label": "Te onderzoeken", "nr": 27}, {"lat": 51.251402, "lon": 6.045346, "score": 0.955, "label": "Te onderzoeken", "nr": 28}, {"lat": 51.237254, "lon": 6.008736, "score": 0.955, "label": "Te onderzoeken", "nr": 29}, {"lat": 51.250055, "lon": 6.043193, "score": 0.955, "label": "Te onderzoeken", "nr": 30}, {"lat": 51.253423, "lon": 6.020581, "score": 0.955, "label": "Te onderzoeken", "nr": 31}, {"lat": 51.256118, "lon": 6.0475, "score": 0.955, "label": "Te onderzoeken", "nr": 32}, {"lat": 51.250728, "lon": 6.046423, "score": 0.955, "label": "Te onderzoeken", "nr": 33}, {"lat": 51.233211, "lon": 6.061498, "score": 0.954, "label": "Te onderzoeken", "nr": 34}, {"lat": 51.235233, "lon": 6.069035, "score": 0.954, "label": "Te onderzoeken", "nr": 35}, {"lat": 51.254097, "lon": 6.020581, "score": 0.954, "label": "Te onderzoeken", "nr": 36}, {"lat": 51.235233, "lon": 6.070112, "score": 0.953, "label": "Te onderzoeken", "nr": 37}, {"lat": 51.267572, "lon": 6.075496, "score": 0.953, "label": "Te onderzoeken", "nr": 38}, {"lat": 51.252076, "lon": 6.045346, "score": 0.953, "label": "Te onderzoeken", "nr": 39}, {"lat": 51.235233, "lon": 6.021658, "score": 0.953, "label": "Te onderzoeken", "nr": 40}, {"lat": 51.245339, "lon": 6.078726, "score": 0.953, "label": "Te onderzoeken", "nr": 41}, {"lat": 51.257466, "lon": 6.05073, "score": 0.952, "label": "Te onderzoeken", "nr": 42}, {"lat": 51.259487, "lon": 6.0475, "score": 0.952, "label": "Te onderzoeken", "nr": 43}, {"lat": 51.232538, "lon": 6.066882, "score": 0.952, "label": "Te onderzoeken", "nr": 44}, {"lat": 51.244665, "lon": 6.07765, "score": 0.952, "label": "Te onderzoeken", "nr": 45}, {"lat": 51.241296, "lon": 6.071189, "score": 0.951, "label": "Te onderzoeken", "nr": 46}, {"lat": 51.24197, "lon": 6.072266, "score": 0.951, "label": "Te onderzoeken", "nr": 47}, {"lat": 51.242644, "lon": 6.071189, "score": 0.951, "label": "Te onderzoeken", "nr": 48}, {"lat": 51.256792, "lon": 6.0475, "score": 0.951, "label": "Te onderzoeken", "nr": 49}, {"lat": 51.257466, "lon": 6.0475, "score": 0.951, "label": "Te onderzoeken", "nr": 50}, {"lat": 51.254097, "lon": 5.997969, "score": 0.951, "label": "Te onderzoeken", "nr": 51}, {"lat": 51.260161, "lon": 6.011967, "score": 0.951, "label": "Te onderzoeken", "nr": 52}, {"lat": 51.233211, "lon": 6.062575, "score": 0.95, "label": "Te onderzoeken", "nr": 53}, {"lat": 51.237927, "lon": 6.018427, "score": 0.95, "label": "Te onderzoeken", "nr": 54}, {"lat": 51.25275, "lon": 6.04427, "score": 0.95, "label": "Te onderzoeken", "nr": 55}, {"lat": 51.269593, "lon": 6.069035, "score": 0.95, "label": "Te onderzoeken", "nr": 56}, {"lat": 51.249381, "lon": 6.043193, "score": 0.95, "label": "Te onderzoeken", "nr": 57}, {"lat": 51.272288, "lon": 6.069035, "score": 0.95, "label": "Te onderzoeken", "nr": 58}, {"lat": 51.234559, "lon": 6.069035, "score": 0.95, "label": "Te onderzoeken", "nr": 59}, {"lat": 51.267572, "lon": 6.032425, "score": 0.95, "label": "Te onderzoeken", "nr": 60}, {"lat": 51.232538, "lon": 6.062575, "score": 0.95, "label": "Te onderzoeken", "nr": 61}, {"lat": 51.272288, "lon": 6.036732, "score": 0.95, "label": "Te onderzoeken", "nr": 62}, {"lat": 51.258139, "lon": 6.049654, "score": 0.949, "label": "Te onderzoeken", "nr": 63}, {"lat": 51.252076, "lon": 6.046423, "score": 0.949, "label": "Te onderzoeken", "nr": 64}, {"lat": 51.232538, "lon": 6.024888, "score": 0.949, "label": "Te onderzoeken", "nr": 65}, {"lat": 51.246012, "lon": 6.078726, "score": 0.949, "label": "Te onderzoeken", "nr": 66}, {"lat": 51.246012, "lon": 6.079803, "score": 0.949, "label": "Te onderzoeken", "nr": 67}, {"lat": 51.246012, "lon": 6.081957, "score": 0.949, "label": "Te onderzoeken", "nr": 68}, {"lat": 51.246686, "lon": 6.078726, "score": 0.949, "label": "Te onderzoeken", "nr": 69}, {"lat": 51.234559, "lon": 6.070112, "score": 0.948, "label": "Te onderzoeken", "nr": 70}, {"lat": 51.266224, "lon": 6.071189, "score": 0.948, "label": "Te onderzoeken", "nr": 71}, {"lat": 51.271614, "lon": 6.036732, "score": 0.948, "label": "Te onderzoeken", "nr": 72}, {"lat": 51.246012, "lon": 6.07765, "score": 0.948, "label": "Te onderzoeken", "nr": 73}, {"lat": 51.259487, "lon": 6.051807, "score": 0.948, "label": "Te onderzoeken", "nr": 74}, {"lat": 51.250055, "lon": 6.046423, "score": 0.947, "label": "Te onderzoeken", "nr": 75}, {"lat": 51.232538, "lon": 6.023811, "score": 0.947, "label": "Te onderzoeken", "nr": 76}, {"lat": 51.233211, "lon": 6.065805, "score": 0.947, "label": "Te onderzoeken", "nr": 77}, {"lat": 51.254771, "lon": 6.069035, "score": 0.947, "label": "Te onderzoeken", "nr": 78}, {"lat": 51.256792, "lon": 5.989355, "score": 0.947, "label": "Te onderzoeken", "nr": 79}, {"lat": 51.24197, "lon": 6.070112, "score": 0.946, "label": "Te onderzoeken", "nr": 80}, {"lat": 51.243317, "lon": 6.066882, "score": 0.946, "label": "Te onderzoeken", "nr": 81}, {"lat": 51.243317, "lon": 6.071189, "score": 0.946, "label": "Te onderzoeken", "nr": 82}, {"lat": 51.251402, "lon": 6.083033, "score": 0.946, "label": "Te onderzoeken", "nr": 83}, {"lat": 51.267572, "lon": 6.067959, "score": 0.946, "label": "Te onderzoeken", "nr": 84}, {"lat": 51.27094, "lon": 6.073342, "score": 0.946, "label": "Te onderzoeken", "nr": 85}, {"lat": 51.25275, "lon": 6.049654, "score": 0.946, "label": "Te onderzoeken", "nr": 86}, {"lat": 51.233885, "lon": 6.067959, "score": 0.946, "label": "Te onderzoeken", "nr": 87}, {"lat": 51.235233, "lon": 6.059344, "score": 0.946, "label": "Te onderzoeken", "nr": 88}, {"lat": 51.259487, "lon": 6.053961, "score": 0.946, "label": "Te onderzoeken", "nr": 89}, {"lat": 51.256792, "lon": 6.05073, "score": 0.945, "label": "Te onderzoeken", "nr": 90}, {"lat": 51.240622, "lon": 6.018427, "score": 0.945, "label": "Te onderzoeken", "nr": 91}, {"lat": 51.258813, "lon": 6.053961, "score": 0.945, "label": "Te onderzoeken", "nr": 92}, {"lat": 51.231864, "lon": 6.069035, "score": 0.945, "label": "Te onderzoeken", "nr": 93}, {"lat": 51.246686, "lon": 6.079803, "score": 0.945, "label": "Te onderzoeken", "nr": 94}, {"lat": 51.252076, "lon": 6.0475, "score": 0.945, "label": "Te onderzoeken", "nr": 95}, {"lat": 51.264203, "lon": 6.073342, "score": 0.945, "label": "Te onderzoeken", "nr": 96}, {"lat": 51.269593, "lon": 6.067959, "score": 0.945, "label": "Te onderzoeken", "nr": 97}, {"lat": 51.249381, "lon": 6.04427, "score": 0.945, "label": "Te onderzoeken", "nr": 98}, {"lat": 51.253423, "lon": 6.003353, "score": 0.944, "label": "Te onderzoeken", "nr": 99}, {"lat": 51.261508, "lon": 6.072266, "score": 0.944, "label": "Te onderzoeken", "nr": 100}];
+var VOORSPELLINGEN = [{"lat": 51.268919, "lon": 6.030272, "score": 0.976, "label": "Te onderzoeken", "nr": 1}, {"lat": 51.264203, "lon": 6.030272, "score": 0.975, "label": "Te onderzoeken", "nr": 2}, {"lat": 51.232538, "lon": 6.021658, "score": 0.973, "label": "Te onderzoeken", "nr": 3}, {"lat": 51.267572, "lon": 6.072266, "score": 0.973, "label": "Te onderzoeken", "nr": 4}, {"lat": 51.269593, "lon": 6.030272, "score": 0.969, "label": "Te onderzoeken", "nr": 5}, {"lat": 51.269593, "lon": 6.031349, "score": 0.968, "label": "Te onderzoeken", "nr": 6}, {"lat": 51.231864, "lon": 6.020581, "score": 0.965, "label": "Te onderzoeken", "nr": 7}, {"lat": 51.268919, "lon": 6.033502, "score": 0.964, "label": "Te onderzoeken", "nr": 8}, {"lat": 51.270267, "lon": 6.073342, "score": 0.963, "label": "Te onderzoeken", "nr": 9}, {"lat": 51.267572, "lon": 6.073342, "score": 0.963, "label": "Te onderzoeken", "nr": 10}, {"lat": 51.250055, "lon": 6.045346, "score": 0.962, "label": "Te onderzoeken", "nr": 11}, {"lat": 51.231864, "lon": 6.021658, "score": 0.962, "label": "Te onderzoeken", "nr": 12}, {"lat": 51.252076, "lon": 6.04427, "score": 0.96, "label": "Te onderzoeken", "nr": 13}, {"lat": 51.250055, "lon": 6.088417, "score": 0.959, "label": "Te onderzoeken", "nr": 14}, {"lat": 51.250055, "lon": 6.04427, "score": 0.959, "label": "Te onderzoeken", "nr": 15}, {"lat": 51.267572, "lon": 6.033502, "score": 0.958, "label": "Te onderzoeken", "nr": 16}, {"lat": 51.24197, "lon": 6.071189, "score": 0.958, "label": "Te onderzoeken", "nr": 17}, {"lat": 51.243317, "lon": 6.072266, "score": 0.958, "label": "Te onderzoeken", "nr": 18}, {"lat": 51.234559, "lon": 6.071189, "score": 0.957, "label": "Te onderzoeken", "nr": 19}, {"lat": 51.268245, "lon": 6.033502, "score": 0.957, "label": "Te onderzoeken", "nr": 20}, {"lat": 51.267572, "lon": 6.074419, "score": 0.957, "label": "Te onderzoeken", "nr": 21}, {"lat": 51.258139, "lon": 6.048577, "score": 0.956, "label": "Te onderzoeken", "nr": 22}, {"lat": 51.251402, "lon": 6.0475, "score": 0.956, "label": "Te onderzoeken", "nr": 23}, {"lat": 51.259487, "lon": 6.046423, "score": 0.956, "label": "Te onderzoeken", "nr": 24}, {"lat": 51.235233, "lon": 6.061498, "score": 0.956, "label": "Te onderzoeken", "nr": 25}, {"lat": 51.253423, "lon": 6.048577, "score": 0.955, "label": "Te onderzoeken", "nr": 26}, {"lat": 51.234559, "lon": 6.061498, "score": 0.955, "label": "Te onderzoeken", "nr": 27}, {"lat": 51.251402, "lon": 6.045346, "score": 0.955, "label": "Te onderzoeken", "nr": 28}, {"lat": 51.237254, "lon": 6.008736, "score": 0.955, "label": "Te onderzoeken", "nr": 29}, {"lat": 51.250055, "lon": 6.043193, "score": 0.955, "label": "Te onderzoeken", "nr": 30}, {"lat": 51.256118, "lon": 6.0475, "score": 0.955, "label": "Te onderzoeken", "nr": 31}, {"lat": 51.253423, "lon": 6.020581, "score": 0.955, "label": "Te onderzoeken", "nr": 32}, {"lat": 51.250728, "lon": 6.046423, "score": 0.955, "label": "Te onderzoeken", "nr": 33}, {"lat": 51.233211, "lon": 6.061498, "score": 0.954, "label": "Te onderzoeken", "nr": 34}, {"lat": 51.235233, "lon": 6.069035, "score": 0.954, "label": "Te onderzoeken", "nr": 35}, {"lat": 51.254097, "lon": 6.020581, "score": 0.954, "label": "Te onderzoeken", "nr": 36}, {"lat": 51.235233, "lon": 6.070112, "score": 0.953, "label": "Te onderzoeken", "nr": 37}, {"lat": 51.267572, "lon": 6.075496, "score": 0.953, "label": "Te onderzoeken", "nr": 38}, {"lat": 51.252076, "lon": 6.045346, "score": 0.953, "label": "Te onderzoeken", "nr": 39}, {"lat": 51.235233, "lon": 6.021658, "score": 0.953, "label": "Te onderzoeken", "nr": 40}, {"lat": 51.245339, "lon": 6.078726, "score": 0.953, "label": "Te onderzoeken", "nr": 41}, {"lat": 51.257466, "lon": 6.05073, "score": 0.952, "label": "Te onderzoeken", "nr": 42}, {"lat": 51.259487, "lon": 6.0475, "score": 0.952, "label": "Te onderzoeken", "nr": 43}, {"lat": 51.232538, "lon": 6.066882, "score": 0.952, "label": "Te onderzoeken", "nr": 44}, {"lat": 51.244665, "lon": 6.07765, "score": 0.952, "label": "Te onderzoeken", "nr": 45}, {"lat": 51.241296, "lon": 6.071189, "score": 0.951, "label": "Te onderzoeken", "nr": 46}, {"lat": 51.24197, "lon": 6.072266, "score": 0.951, "label": "Te onderzoeken", "nr": 47}, {"lat": 51.242644, "lon": 6.071189, "score": 0.951, "label": "Te onderzoeken", "nr": 48}, {"lat": 51.256792, "lon": 6.0475, "score": 0.951, "label": "Te onderzoeken", "nr": 49}, {"lat": 51.257466, "lon": 6.0475, "score": 0.951, "label": "Te onderzoeken", "nr": 50}, {"lat": 51.254097, "lon": 5.997969, "score": 0.951, "label": "Te onderzoeken", "nr": 51}, {"lat": 51.260161, "lon": 6.011967, "score": 0.951, "label": "Te onderzoeken", "nr": 52}, {"lat": 51.233211, "lon": 6.062575, "score": 0.95, "label": "Te onderzoeken", "nr": 53}, {"lat": 51.237927, "lon": 6.018427, "score": 0.95, "label": "Te onderzoeken", "nr": 54}, {"lat": 51.25275, "lon": 6.04427, "score": 0.95, "label": "Te onderzoeken", "nr": 55}, {"lat": 51.269593, "lon": 6.069035, "score": 0.95, "label": "Te onderzoeken", "nr": 56}, {"lat": 51.249381, "lon": 6.043193, "score": 0.95, "label": "Te onderzoeken", "nr": 57}, {"lat": 51.267572, "lon": 6.032425, "score": 0.95, "label": "Te onderzoeken", "nr": 58}, {"lat": 51.272288, "lon": 6.069035, "score": 0.95, "label": "Te onderzoeken", "nr": 59}, {"lat": 51.234559, "lon": 6.069035, "score": 0.95, "label": "Te onderzoeken", "nr": 60}, {"lat": 51.232538, "lon": 6.062575, "score": 0.95, "label": "Te onderzoeken", "nr": 61}, {"lat": 51.272288, "lon": 6.036732, "score": 0.95, "label": "Te onderzoeken", "nr": 62}, {"lat": 51.258139, "lon": 6.049654, "score": 0.949, "label": "Te onderzoeken", "nr": 63}, {"lat": 51.252076, "lon": 6.046423, "score": 0.949, "label": "Te onderzoeken", "nr": 64}, {"lat": 51.232538, "lon": 6.024888, "score": 0.949, "label": "Te onderzoeken", "nr": 65}, {"lat": 51.246012, "lon": 6.078726, "score": 0.949, "label": "Te onderzoeken", "nr": 66}, {"lat": 51.246012, "lon": 6.079803, "score": 0.949, "label": "Te onderzoeken", "nr": 67}, {"lat": 51.246012, "lon": 6.081957, "score": 0.949, "label": "Te onderzoeken", "nr": 68}, {"lat": 51.246686, "lon": 6.078726, "score": 0.949, "label": "Te onderzoeken", "nr": 69}, {"lat": 51.234559, "lon": 6.070112, "score": 0.948, "label": "Te onderzoeken", "nr": 70}, {"lat": 51.266224, "lon": 6.071189, "score": 0.948, "label": "Te onderzoeken", "nr": 71}, {"lat": 51.271614, "lon": 6.036732, "score": 0.948, "label": "Te onderzoeken", "nr": 72}, {"lat": 51.246012, "lon": 6.07765, "score": 0.948, "label": "Te onderzoeken", "nr": 73}, {"lat": 51.259487, "lon": 6.051807, "score": 0.948, "label": "Te onderzoeken", "nr": 74}, {"lat": 51.250055, "lon": 6.046423, "score": 0.947, "label": "Te onderzoeken", "nr": 75}, {"lat": 51.232538, "lon": 6.023811, "score": 0.947, "label": "Te onderzoeken", "nr": 76}, {"lat": 51.233211, "lon": 6.065805, "score": 0.947, "label": "Te onderzoeken", "nr": 77}, {"lat": 51.254771, "lon": 6.069035, "score": 0.947, "label": "Te onderzoeken", "nr": 78}, {"lat": 51.256792, "lon": 5.989355, "score": 0.947, "label": "Te onderzoeken", "nr": 79}, {"lat": 51.24197, "lon": 6.070112, "score": 0.946, "label": "Te onderzoeken", "nr": 80}, {"lat": 51.243317, "lon": 6.066882, "score": 0.946, "label": "Te onderzoeken", "nr": 81}, {"lat": 51.243317, "lon": 6.071189, "score": 0.946, "label": "Te onderzoeken", "nr": 82}, {"lat": 51.251402, "lon": 6.083033, "score": 0.946, "label": "Te onderzoeken", "nr": 83}, {"lat": 51.267572, "lon": 6.067959, "score": 0.946, "label": "Te onderzoeken", "nr": 84}, {"lat": 51.27094, "lon": 6.073342, "score": 0.946, "label": "Te onderzoeken", "nr": 85}, {"lat": 51.25275, "lon": 6.049654, "score": 0.946, "label": "Te onderzoeken", "nr": 86}, {"lat": 51.233885, "lon": 6.067959, "score": 0.946, "label": "Te onderzoeken", "nr": 87}, {"lat": 51.235233, "lon": 6.059344, "score": 0.946, "label": "Te onderzoeken", "nr": 88}, {"lat": 51.259487, "lon": 6.053961, "score": 0.946, "label": "Te onderzoeken", "nr": 89}, {"lat": 51.256792, "lon": 6.05073, "score": 0.945, "label": "Te onderzoeken", "nr": 90}, {"lat": 51.240622, "lon": 6.018427, "score": 0.945, "label": "Te onderzoeken", "nr": 91}, {"lat": 51.258813, "lon": 6.053961, "score": 0.945, "label": "Te onderzoeken", "nr": 92}, {"lat": 51.231864, "lon": 6.069035, "score": 0.945, "label": "Te onderzoeken", "nr": 93}, {"lat": 51.246686, "lon": 6.079803, "score": 0.945, "label": "Te onderzoeken", "nr": 94}, {"lat": 51.252076, "lon": 6.0475, "score": 0.945, "label": "Te onderzoeken", "nr": 95}, {"lat": 51.264203, "lon": 6.073342, "score": 0.945, "label": "Te onderzoeken", "nr": 96}, {"lat": 51.269593, "lon": 6.067959, "score": 0.945, "label": "Te onderzoeken", "nr": 97}, {"lat": 51.249381, "lon": 6.04427, "score": 0.945, "label": "Te onderzoeken", "nr": 98}, {"lat": 51.253423, "lon": 6.003353, "score": 0.944, "label": "Te onderzoeken", "nr": 99}, {"lat": 51.261508, "lon": 6.072266, "score": 0.944, "label": "Te onderzoeken", "nr": 100}];
 
 // Haversine afstandsberekening
 function haversine(lat1, lon1, lat2, lon2) {
@@ -2589,8 +2589,35 @@ var feedbackMarkers = L.layerGroup().addTo(map);
 // In-memory opslag — werkt ook als localStorage niet beschikbaar is (file:// URLs)
 var _memFeedback = [];
 var _memFotos = [];
+var PREDICT_VERSIE = '2.0.1';
+
 function _slaOp(key, data) {
-  try { localStorage.setItem(key, JSON.stringify(data)); } catch(e) {}
+  var json = JSON.stringify(data);
+  // Primair: localStorage
+  try { localStorage.setItem(key, json); } catch(e) {
+    console.warn('localStorage schrijven mislukt:', e);
+  }
+  // Backup: sessionStorage (overleeft page refresh binnen zelfde tab)
+  try { sessionStorage.setItem(key, json); } catch(e) {}
+}
+
+function _laadOp(key) {
+  // Probeer localStorage eerst, dan sessionStorage als fallback
+  var data = null;
+  try {
+    var raw = localStorage.getItem(key);
+    if (raw) data = JSON.parse(raw);
+  } catch(e) {}
+  if (!data) {
+    try {
+      var raw2 = sessionStorage.getItem(key);
+      if (raw2) {
+        data = JSON.parse(raw2);
+        console.info('Fallback: data geladen uit sessionStorage voor ' + key);
+      }
+    } catch(e) {}
+  }
+  return data || [];
 }
 
 // Verberg voorspellings-markers als ter plaatse "leeg" is opgegeven
@@ -2646,14 +2673,12 @@ var ANDERE_SOORTEN = ['Konijn','Steenuil','Kerkuil','Bever','Vos','Ree','Das','O
 var gekozenSoort = 'das';
 var gekozenZekerheid = null;
 
-// Laad opgeslagen feedback uit localStorage → in-memory
+// Laad opgeslagen feedback uit localStorage/sessionStorage → in-memory
 (function() {
-  try {
-    _memFeedback = JSON.parse(localStorage.getItem('predict_feedback') || '[]');
-  } catch(e) { _memFeedback = []; }
-  try {
-    _memFotos = JSON.parse(localStorage.getItem('predict_fotos') || '[]');
-  } catch(e) { _memFotos = []; }
+  _memFeedback = _laadOp('predict_feedback');
+  _memFotos = _laadOp('predict_fotos');
+  console.info('[Predict v' + PREDICT_VERSIE + '] Geladen: ' +
+    _memFeedback.length + ' waarnemingen, ' + _memFotos.length + ' fotos');
   _memFeedback.forEach(function(fb, i) { toonFeedbackMarker(fb, i); });
   verbergBezochteVoorspellingen();
 })();
@@ -3485,15 +3510,26 @@ function openExport() {
     el.innerHTML = html;
   }
 
-  // Diagnostiek tonen
+  // Diagnostiek tonen — uitgebreid voor troubleshooting
   var diagEl = document.getElementById('exDiagnostiek');
   var lsWerkt = false;
   try { localStorage.setItem('_test', '1'); localStorage.removeItem('_test'); lsWerkt = true; } catch(e) {}
-  var diagTekst = 'Opslag: ' + _memFeedback.length + ' in geheugen';
-  try { diagTekst += ', ' + JSON.parse(localStorage.getItem('predict_feedback') || '[]').length + ' in localStorage'; } catch(e) {}
-  diagTekst += ' | localStorage: ' + (lsWerkt ? 'OK' : 'NIET BESCHIKBAAR');
-  diagTekst += ' | Protocol: ' + location.protocol;
-  diagEl.textContent = diagTekst;
+  var nLs = 0;
+  try { nLs = JSON.parse(localStorage.getItem('predict_feedback') || '[]').length; } catch(e) {}
+  var nSs = 0;
+  try { nSs = JSON.parse(sessionStorage.getItem('predict_feedback') || '[]').length; } catch(e) {}
+  // Tel server-rendered veldwaarnemingen (al op PC)
+  var nServRendered = 0;
+  try { nServRendered = veldLayer.getLayers().length; } catch(e) {}
+  var diagHtml = '<b>Predict v' + PREDICT_VERSIE + '</b><br>';
+  diagHtml += 'Nieuwe waarnemingen (telefoon): <b>' + _memFeedback.length + '</b><br>';
+  diagHtml += 'In localStorage: ' + nLs + ' | sessionStorage: ' + nSs + '<br>';
+  diagHtml += 'Veldwaarnemingen op kaart (al op PC): ' + nServRendered + '<br>';
+  diagHtml += 'localStorage: ' + (lsWerkt ? '&#9989; OK' : '&#10060; NIET BESCHIKBAAR');
+  if (_memFeedback.length === 0 && nServRendered > 0) {
+    diagHtml += '<br><span style="color:#e67e22;font-weight:bold">&#9888; De markers die je ziet zijn al gesynchroniseerd.<br>Alleen NIEUWE waarnemingen (via + knop) worden geëxporteerd.</span>';
+  }
+  diagEl.innerHTML = diagHtml;
   diagEl.style.display = '';
 
   document.getElementById('exOverlay').classList.add('open');
