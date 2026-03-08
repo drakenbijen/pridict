@@ -376,6 +376,18 @@ window.onerror = function(msg, url, line) {
       <span class="fb-icon">&#9881;</span>
       <div class="fb-tekst">Molshopen<small>Veel wormen = geschikt foerageergebied</small></div>
     </div>
+    <div class="feedback-optie" style="background:#1abc9c;color:white" onclick="kiesType('onderdoorgang')">
+      <span class="fb-icon">&#9961;</span>
+      <div class="fb-tekst">Onderdoorgang<small>Tunnel onder hek/prikkeldraad</small></div>
+    </div>
+    <div class="feedback-optie" style="background:#d4a017;color:white" onclick="kiesType('wroetplek')">
+      <span class="fb-icon">&#127793;</span>
+      <div class="fb-tekst">Wroetplek<small>Omgewoelde graszode (wormen zoeken)</small></div>
+    </div>
+    <div class="feedback-optie" style="background:#c0392b;color:white" onclick="kiesType('prooiresten')">
+      <span class="fb-icon">&#128027;</span>
+      <div class="fb-tekst">Prooiresten<small>Uitgegraven wespennest/slakken</small></div>
+    </div>
     <div class="feedback-optie rood" onclick="kiesType('leeg')">
       <span class="fb-icon">&#10060;</span>
       <div class="fb-tekst">Niets gevonden<small>Locatie bezocht, geen aanwijzingen</small></div>
@@ -3104,6 +3116,7 @@ var FB_KLEUREN = {
   burcht: '#28a745', wissel: '#2980b9', graafspoor: '#8B4513',
   haar: '#8e44ad', sporen: '#e67e22', leeg: '#e74c3c',
   molshopen: '#8B6914', onbereikbaar: '#7f8c8d',
+  onderdoorgang: '#1abc9c', wroetplek: '#d4a017', prooiresten: '#c0392b',
   gevonden: '#28a745',
   waargenomen: '#27ae60', nest_hol: '#8e44ad', dood: '#e74c3c'
 };
@@ -3111,6 +3124,7 @@ var FB_LABELS = {
   burcht: 'Burcht', wissel: 'Wissel', graafspoor: 'Graafspoor',
   haar: 'Haren', sporen: 'Sporen', leeg: 'Leeg',
   molshopen: 'Molshopen', onbereikbaar: 'Onbereikbaar',
+  onderdoorgang: 'Onderdoorgang', wroetplek: 'Wroetplek', prooiresten: 'Prooiresten',
   gevonden: 'Burcht',
   waargenomen: 'Waargenomen', nest_hol: 'Nest/hol', dood: 'Dood'
 };
@@ -3118,10 +3132,11 @@ var FB_ICONS = {
   burcht: '\u2705', wissel: '\ud83d\udc3e', graafspoor: '\u26cf',
   haar: '\ud83d\udd2c', sporen: '\ud83d\udc40', leeg: '\u274c',
   molshopen: '\u2699', onbereikbaar: '\ud83d\udeab',
+  onderdoorgang: '\u26e9', wroetplek: '\ud83c\udf31', prooiresten: '\ud83d\udc1b',
   gevonden: '\u2705',
   waargenomen: '\ud83d\udc41', nest_hol: '\ud83c\udfe0', dood: '\u2620'
 };
-var INTENSITEIT_TYPES = {'graafspoor':1, 'sporen':1, 'wissel':1, 'molshopen':1, 'haar':1};
+var INTENSITEIT_TYPES = {'graafspoor':1, 'sporen':1, 'wissel':1, 'molshopen':1, 'haar':1, 'onderdoorgang':1, 'wroetplek':1, 'prooiresten':1};
 var INTENSITEIT_LABELS = {'weinig':'Weinig','normaal':'Normaal','veel':'Veel'};
 var ANDERE_SOORTEN = ['Konijn','Steenuil','Kerkuil','Bever','Vos','Ree','Das','Overig'];
 var gekozenSoort = 'das';
