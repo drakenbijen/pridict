@@ -2589,7 +2589,7 @@ var feedbackMarkers = L.layerGroup().addTo(map);
 // In-memory opslag — werkt ook als localStorage niet beschikbaar is (file:// URLs)
 var _memFeedback = [];
 var _memFotos = [];
-var PREDICT_VERSIE = '2.0.2';
+var PREDICT_VERSIE = '2.0.3';
 
 function _slaOp(key, data) {
   var json = JSON.stringify(data);
@@ -3536,13 +3536,16 @@ function openExport() {
   // Tel server-rendered veldwaarnemingen (al op PC)
   var nServRendered = 0;
   try { nServRendered = veldLayer.getLayers().length; } catch(e) {}
+  var nExport = data.length;
   var diagHtml = '<b>Predict v' + PREDICT_VERSIE + '</b><br>';
-  diagHtml += 'Nieuwe waarnemingen (telefoon): <b>' + _memFeedback.length + '</b><br>';
-  diagHtml += 'In localStorage: ' + nLs + ' | sessionStorage: ' + nSs + '<br>';
-  diagHtml += 'Veldwaarnemingen op kaart (al op PC): ' + nServRendered + '<br>';
+  diagHtml += 'Te exporteren: <b>' + nExport + '</b> waarnemingen<br>';
+  diagHtml += 'In geheugen: ' + _memFeedback.length + ' | localStorage: ' + nLs + ' | sessionStorage: ' + nSs + '<br>';
+  diagHtml += 'Reeds op PC (server-rendered): ' + nServRendered + '<br>';
   diagHtml += 'localStorage: ' + (lsWerkt ? '&#9989; OK' : '&#10060; NIET BESCHIKBAAR');
-  if (_memFeedback.length === 0 && nServRendered > 0) {
-    diagHtml += '<br><span style="color:#e67e22;font-weight:bold">&#9888; De markers die je ziet zijn al gesynchroniseerd.<br>Alleen NIEUWE waarnemingen (via + knop) worden geëxporteerd.</span>';
+  if (nExport === 0 && nServRendered > 0) {
+    diagHtml += '<br><span style="color:#e67e22;font-weight:bold">&#9888; Alle ' + nServRendered + ' markers op de kaart staan al op de PC.<br>Voeg NIEUWE waarnemingen toe via de + knop.</span>';
+  } else if (nExport === 0 && nLs === 0 && nSs === 0) {
+    diagHtml += '<br><span style="color:#e74c3c;font-weight:bold">&#10060; Geen data gevonden in opslag.<br>Mogelijk is de data verloren na een pagina-refresh.</span>';
   }
   diagEl.innerHTML = diagHtml;
   diagEl.style.display = '';
@@ -3675,10 +3678,14 @@ function syncNaarPC() {
   if (fb.length === 0 && fotos.length === 0) {
     var nOpKaart = 0;
     try { nOpKaart = veldLayer.getLayers().length; } catch(e) {}
-    if (nOpKaart > 0) {
-      toonToast('Alle ' + nOpKaart + ' waarnemingen staan al op de PC. Voeg nieuwe toe via + knop.', 5000);
+    var nLsCheck = 0;
+    try { nLsCheck = JSON.parse(localStorage.getItem('predict_feedback') || '[]').length; } catch(e) {}
+    if (nLsCheck === 0 && nOpKaart > 0) {
+      toonToast('Geen nieuwe data. De ' + nOpKaart + ' markers op de kaart staan al op de PC.', 5000);
+    } else if (nLsCheck === 0) {
+      toonToast('Geen waarnemingen gevonden. Voeg toe via de + knop.', 4000);
     } else {
-      toonToast('Geen nieuwe waarnemingen. Voeg toe via + knop.');
+      toonToast('Opslag bevat ' + nLsCheck + ' items maar laden mislukt. Probeer pagina te verversen.', 5000);
     }
     return;
   }
@@ -3714,8 +3721,8 @@ function syncNaarPC() {
     }
     doeSync(0);
   } else {
-    // Op GitHub Pages (HTTPS): redirect-methode
-    // fetch() naar HTTP is geblokkeerd, maar navigatie niet
+    // Op GitHub Pages (HTTPS): form POST methode
+    // fetch() naar HTTP is geblokkeerd, maar form submit niet
     var syncIp = localStorage.getItem('predict_sync_ip');
 
     if (!syncIp) {
@@ -3731,14 +3738,24 @@ function syncNaarPC() {
       localStorage.setItem('predict_sync_ip', syncIp);
     }
 
-    // Encodeer data in URL en navigeer (geen fetch nodig)
+    // Encodeer data en verstuur via verborgen form POST
+    // (geen URL-lengtelimiet, werkt HTTPS→HTTP)
     var syncData = JSON.stringify({ feedback: fb, fotos: fotos });
     var encoded = btoa(unescape(encodeURIComponent(syncData)));
-    var syncUrl = 'http://' + syncIp + ':8765/sync/receive?data=' + encodeURIComponent(encoded);
 
-    // Open in nieuw tabblad zodat deze pagina open blijft
-    toonToast('Sync naar ' + syncIp + '...');
-    window.open(syncUrl, '_blank');
+    var form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'http://' + syncIp + ':8765/sync/receive';
+    form.target = '_blank';
+    var inp = document.createElement('input');
+    inp.type = 'hidden';
+    inp.name = 'data';
+    inp.value = encoded;
+    form.appendChild(inp);
+    document.body.appendChild(form);
+    toonToast('Sync naar ' + syncIp + '... (' + fb.length + ' items)');
+    form.submit();
+    document.body.removeChild(form);
   }
 }
 
