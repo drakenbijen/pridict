@@ -467,6 +467,11 @@ window.onerror = function(msg, url, line) {
     <span class="ea-icon" style="font-size:16px">&#9881;</span>
     <div style="font-size:13px">Sync IP wijzigen<br><small style="color:#888">Scan QR of voer IP handmatig in</small></div>
   </div>
+  <div class="export-actie" onclick="kopieerJSON()" style="border-color:#8e44ad;padding:8px 12px">
+    <span class="ea-icon" style="font-size:16px">&#128203;</span>
+    <div style="font-size:13px">Kopieer als JSON<br><small style="color:#888">Plak op PC om data over te zetten</small></div>
+  </div>
+  <div id="exDiagnostiek" style="margin-top:8px;padding:8px;background:#f8f8f8;border-radius:6px;font-size:11px;color:#666;display:none"></div>
   <button class="feedback-sluiten" onclick="sluitExport()">Sluiten</button>
 </div>
 
@@ -2504,13 +2509,20 @@ map.createPane('feedbackPane');
 map.getPane('feedbackPane').style.zIndex = 650;
 var feedbackMarkers = L.layerGroup().addTo(map);
 
+// In-memory opslag — werkt ook als localStorage niet beschikbaar is (file:// URLs)
+var _memFeedback = [];
+var _memFotos = [];
+function _slaOp(key, data) {
+  try { localStorage.setItem(key, JSON.stringify(data)); } catch(e) {}
+}
+
 // Verberg voorspellings-markers als ter plaatse "leeg" is opgegeven
 // (niets gevonden → punt hoeft niet meer op de kaart)
 // Bij een vondst (burcht, wissel, etc.) blijft de voorspelling staan
 // MOET vóór de localStorage-lader staan (wordt daar aangeroepen)
 function verbergBezochteVoorspellingen() {
   try {
-    var saved = JSON.parse(localStorage.getItem('predict_feedback') || '[]');
+    var saved = _memFeedback;
     if (saved.length === 0) return;
     var leegPunten = saved.filter(function(fb) {
       return fb.type === 'leeg' || fb.type === 'onbereikbaar';
@@ -2529,14 +2541,16 @@ function verbergBezochteVoorspellingen() {
   } catch(e) {}
 }
 
-// Laad opgeslagen feedback uit localStorage
+// Laad opgeslagen feedback uit localStorage → in-memory
 (function() {
   try {
-    var saved = JSON.parse(localStorage.getItem('predict_feedback') || '[]');
-    saved.forEach(function(fb, i) { toonFeedbackMarker(fb, i); });
-    // Verberg voorspellingen die al bezocht zijn
-    verbergBezochteVoorspellingen();
-  } catch(e) {}
+    _memFeedback = JSON.parse(localStorage.getItem('predict_feedback') || '[]');
+  } catch(e) { _memFeedback = []; }
+  try {
+    _memFotos = JSON.parse(localStorage.getItem('predict_fotos') || '[]');
+  } catch(e) { _memFotos = []; }
+  _memFeedback.forEach(function(fb, i) { toonFeedbackMarker(fb, i); });
+  verbergBezochteVoorspellingen();
 })();
 
 function openFeedback() {
@@ -2718,11 +2732,10 @@ function toonFeedbackMarker(fb, idx) {
 // Verwijder een feedback-waarneming
 function verwijderFeedback(idx) {
   if (idx < 0) return;
-  var saved = JSON.parse(localStorage.getItem('predict_feedback') || '[]');
-  if (idx >= saved.length) return;
-  var type = saved[idx].type;
-  saved.splice(idx, 1);
-  localStorage.setItem('predict_feedback', JSON.stringify(saved));
+  if (idx >= _memFeedback.length) return;
+  var type = _memFeedback[idx].type;
+  _memFeedback.splice(idx, 1);
+  _slaOp('predict_feedback', _memFeedback);
   // Herlaad alle markers
   herlaadFeedbackMarkers();
   map.closePopup();
@@ -2734,10 +2747,9 @@ var bewerkIndex = null;
 function bewerkFeedback(idx) {
   if (idx < 0) return;
   bewerkIndex = idx;
-  var saved = JSON.parse(localStorage.getItem('predict_feedback') || '[]');
-  if (idx >= saved.length) return;
-  feedbackLat = saved[idx].lat;
-  feedbackLon = saved[idx].lon;
+  if (idx >= _memFeedback.length) return;
+  feedbackLat = _memFeedback[idx].lat;
+  feedbackLon = _memFeedback[idx].lon;
   map.closePopup();
   document.getElementById('fbTitel').textContent = 'Type wijzigen';
   document.getElementById('fbCoords').textContent =
@@ -2751,11 +2763,7 @@ function bewerkFeedback(idx) {
 
 function herlaadFeedbackMarkers() {
   feedbackMarkers.clearLayers();
-  try {
-    var saved = JSON.parse(localStorage.getItem('predict_feedback') || '[]');
-    saved.forEach(function(fb, i) { toonFeedbackMarker(fb, i); });
-  } catch(e) {}
-  // Verberg voorspellingen die al bezocht zijn
+  _memFeedback.forEach(function(fb, i) { toonFeedbackMarker(fb, i); });
   verbergBezochteVoorspellingen();
 }
 
@@ -3057,7 +3065,7 @@ function voltooiFeedback(type, fotoDataUrl) {
   };
 
   // Bij bewerking: vervang de bestaande entry
-  var saved = JSON.parse(localStorage.getItem('predict_feedback') || '[]');
+  var saved = _memFeedback;
   if (bewerkIndex !== null && bewerkIndex >= 0 && bewerkIndex < saved.length) {
     // Bewaar oude foto en datum als die er waren
     var oud = saved[bewerkIndex];
@@ -3091,16 +3099,9 @@ function voltooiFeedback(type, fotoDataUrl) {
     }
   }
 
-  // Sla op
-  try {
-    localStorage.setItem('predict_feedback', JSON.stringify(saved));
-  } catch(e) {
-    // localStorage vol — verwijder oudste
-    try {
-      if (saved.length > 1) saved.shift();
-      localStorage.setItem('predict_feedback', JSON.stringify(saved));
-    } catch(e2) {}
-  }
+  // Sla op (memory + localStorage als backup)
+  _memFeedback = saved;
+  _slaOp('predict_feedback', _memFeedback);
 
   // Herlaad alle markers (met juiste indices)
   herlaadFeedbackMarkers();
@@ -3127,8 +3128,7 @@ function voltooiFeedback(type, fotoDataUrl) {
 
 // === Export-systeem ===
 function getFeedbackData() {
-  try { return JSON.parse(localStorage.getItem('predict_feedback') || '[]'); }
-  catch(e) { return []; }
+  return _memFeedback.slice();
 }
 
 function maakExportTekst() {
@@ -3187,8 +3187,7 @@ function maakExportTekst() {
 }
 
 function getFotoData() {
-  try { return JSON.parse(localStorage.getItem('predict_fotos') || '[]'); }
-  catch(e) { return []; }
+  return _memFotos.slice();
 }
 
 function openExport() {
@@ -3232,6 +3231,17 @@ function openExport() {
     el.innerHTML = html;
   }
 
+  // Diagnostiek tonen
+  var diagEl = document.getElementById('exDiagnostiek');
+  var lsWerkt = false;
+  try { localStorage.setItem('_test', '1'); localStorage.removeItem('_test'); lsWerkt = true; } catch(e) {}
+  var diagTekst = 'Opslag: ' + _memFeedback.length + ' in geheugen';
+  try { diagTekst += ', ' + JSON.parse(localStorage.getItem('predict_feedback') || '[]').length + ' in localStorage'; } catch(e) {}
+  diagTekst += ' | localStorage: ' + (lsWerkt ? 'OK' : 'NIET BESCHIKBAAR');
+  diagTekst += ' | Protocol: ' + location.protocol;
+  diagEl.textContent = diagTekst;
+  diagEl.style.display = '';
+
   document.getElementById('exOverlay').classList.add('open');
   document.getElementById('exPanel').classList.add('open');
 }
@@ -3239,6 +3249,40 @@ function openExport() {
 function sluitExport() {
   document.getElementById('exOverlay').classList.remove('open');
   document.getElementById('exPanel').classList.remove('open');
+}
+
+function kopieerJSON() {
+  var data = getFeedbackData();
+  var fotos = getFotoData();
+  if (data.length === 0 && fotos.length === 0) {
+    toonToast('Geen waarnemingen om te kopiëren');
+    return;
+  }
+  var json = JSON.stringify({ feedback: data, fotos: fotos }, null, 2);
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(json).then(function() {
+      toonToast('JSON gekopieerd naar klembord (' + data.length + ' waarnemingen)');
+    }).catch(function() {
+      _toonJsonVenster(json);
+    });
+  } else {
+    _toonJsonVenster(json);
+  }
+  sluitExport();
+}
+
+function _toonJsonVenster(json) {
+  var ta = document.createElement('textarea');
+  ta.value = json;
+  ta.style.cssText = 'position:fixed;top:10%;left:5%;width:90%;height:60%;z-index:10000;font-size:12px;padding:10px;border:2px solid #c77b30;border-radius:8px';
+  var sluiter = document.createElement('button');
+  sluiter.textContent = 'Sluiten';
+  sluiter.style.cssText = 'position:fixed;top:72%;left:5%;z-index:10001;padding:12px 24px;background:#c77b30;color:white;border:none;border-radius:8px;font-size:16px';
+  sluiter.onclick = function() { ta.remove(); sluiter.remove(); };
+  document.body.appendChild(ta);
+  document.body.appendChild(sluiter);
+  ta.select();
+  toonToast('Selecteer alles en kopieer handmatig');
 }
 
 function exportWhatsApp() {
@@ -3321,7 +3365,7 @@ function syncNaarPC() {
   // Verzamel data
   var fb = getFeedbackData();
   var fotos = [];
-  try { fotos = JSON.parse(localStorage.getItem('predict_fotos') || '[]'); } catch(e) {}
+  fotos = _memFotos.slice();
 
   if (fb.length === 0 && fotos.length === 0) {
     toonToast('Geen data om te synchroniseren');
@@ -3422,19 +3466,8 @@ document.getElementById('cameraInput').addEventListener('change', function(e) {
         hoogte: Math.round(h)
       };
 
-      try {
-        var fotos = JSON.parse(localStorage.getItem('predict_fotos') || '[]');
-        fotos.push(foto);
-        localStorage.setItem('predict_fotos', JSON.stringify(fotos));
-      } catch(e) {
-        // localStorage vol — verwijder oudste foto
-        try {
-          var fotos = JSON.parse(localStorage.getItem('predict_fotos') || '[]');
-          if (fotos.length > 0) fotos.shift();
-          fotos.push(foto);
-          localStorage.setItem('predict_fotos', JSON.stringify(fotos));
-        } catch(e2) {}
-      }
+      _memFotos.push(foto);
+      _slaOp('predict_fotos', _memFotos);
 
       // Marker op kaart
       var fotoMarker = L.marker([foto.lat, foto.lon], {
@@ -3474,11 +3507,10 @@ function sluitFotoPreview() {
   document.getElementById('fotoOverlay').classList.remove('open');
 }
 
-// Laad opgeslagen foto's bij opstarten
+// Laad opgeslagen foto's bij opstarten (uit _memFotos, al geladen)
 (function() {
   try {
-    var fotos = JSON.parse(localStorage.getItem('predict_fotos') || '[]');
-    fotos.forEach(function(foto) {
+    _memFotos.forEach(function(foto) {
       if (!foto.data || !foto.lat) return;
       var fotoMarker = L.marker([foto.lat, foto.lon], {
         icon: L.divIcon({
