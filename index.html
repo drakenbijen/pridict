@@ -2541,6 +2541,34 @@ function verbergBezochteVoorspellingen() {
   } catch(e) {}
 }
 
+// Constanten voor feedback-markers (moet vóór de startup-lader staan)
+var FB_KLEUREN = {
+  burcht: '#28a745', wissel: '#2980b9', graafspoor: '#8B4513',
+  haar: '#8e44ad', sporen: '#e67e22', leeg: '#e74c3c',
+  molshopen: '#8B6914', onbereikbaar: '#7f8c8d',
+  gevonden: '#28a745',
+  waargenomen: '#27ae60', nest_hol: '#8e44ad', dood: '#e74c3c'
+};
+var FB_LABELS = {
+  burcht: 'Burcht', wissel: 'Wissel', graafspoor: 'Graafspoor',
+  haar: 'Haren', sporen: 'Sporen', leeg: 'Leeg',
+  molshopen: 'Molshopen', onbereikbaar: 'Onbereikbaar',
+  gevonden: 'Burcht',
+  waargenomen: 'Waargenomen', nest_hol: 'Nest/hol', dood: 'Dood'
+};
+var FB_ICONS = {
+  burcht: '\u2705', wissel: '\ud83d\udc3e', graafspoor: '\u26cf',
+  haar: '\ud83d\udd2c', sporen: '\ud83d\udc40', leeg: '\u274c',
+  molshopen: '\u2699', onbereikbaar: '\ud83d\udeab',
+  gevonden: '\u2705',
+  waargenomen: '\ud83d\udc41', nest_hol: '\ud83c\udfe0', dood: '\u2620'
+};
+var INTENSITEIT_TYPES = {'graafspoor':1, 'sporen':1, 'wissel':1, 'molshopen':1, 'haar':1};
+var INTENSITEIT_LABELS = {'weinig':'Weinig','normaal':'Normaal','veel':'Veel'};
+var ANDERE_SOORTEN = ['Konijn','Steenuil','Kerkuil','Bever','Vos','Ree','Das','Overig'];
+var gekozenSoort = 'das';
+var gekozenZekerheid = null;
+
 // Laad opgeslagen feedback uit localStorage → in-memory
 (function() {
   try {
@@ -2599,36 +2627,6 @@ function dichtstbijBurcht(lat, lon) {
   });
   return minDist;
 }
-
-var FB_KLEUREN = {
-  burcht: '#28a745', wissel: '#2980b9', graafspoor: '#8B4513',
-  haar: '#8e44ad', sporen: '#e67e22', leeg: '#e74c3c',
-  molshopen: '#8B6914', onbereikbaar: '#7f8c8d',
-  gevonden: '#28a745',
-  waargenomen: '#27ae60', nest_hol: '#8e44ad', dood: '#e74c3c'
-};
-var FB_LABELS = {
-  burcht: 'Burcht', wissel: 'Wissel', graafspoor: 'Graafspoor',
-  haar: 'Haren', sporen: 'Sporen', leeg: 'Leeg',
-  molshopen: 'Molshopen', onbereikbaar: 'Onbereikbaar',
-  gevonden: 'Burcht',
-  waargenomen: 'Waargenomen', nest_hol: 'Nest/hol', dood: 'Dood'
-};
-var FB_ICONS = {
-  burcht: '\u2705', wissel: '\ud83d\udc3e', graafspoor: '\u26cf',
-  haar: '\ud83d\udd2c', sporen: '\ud83d\udc40', leeg: '\u274c',
-  molshopen: '\u2699', onbereikbaar: '\ud83d\udeab',
-  gevonden: '\u2705',
-  waargenomen: '\ud83d\udc41', nest_hol: '\ud83c\udfe0', dood: '\u2620'
-};
-// Types die intensiteit-vraag krijgen
-var INTENSITEIT_TYPES = {'graafspoor':1, 'sporen':1, 'wissel':1, 'molshopen':1, 'haar':1};
-var INTENSITEIT_LABELS = {'weinig':'Weinig','normaal':'Normaal','veel':'Veel'};
-
-// Multi-soort constanten
-var ANDERE_SOORTEN = ['Konijn','Steenuil','Kerkuil','Bever','Vos','Ree','Das','Overig'];
-var gekozenSoort = 'das';
-var gekozenZekerheid = null;
 
 function toonFeedbackMarker(fb, idx) {
   var type = fb.type === 'gevonden' ? 'burcht' : fb.type;
