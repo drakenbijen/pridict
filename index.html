@@ -286,7 +286,7 @@ window.onerror = function(msg, url, line) {
 </div>
 
 <!-- Info panel -->
-<div class="info-panel" id="infoPanel">
+<div class="info-panel hidden" id="infoPanel">
   <h3>Predict — Veldkaart</h3>
   <div class="legenda-item">
     <div class="legenda-kleur" style="background:#28a745; border-color:#155724;"></div>
@@ -2095,7 +2095,7 @@ var BEKENDE_BURCHTEN = [[51.2498819, 6.022837], [51.255114, 6.02762], [51.256943
               radius: 5, color: '#f39c12', fillColor: '#f1c40f',
               fillOpacity: 0.85, weight: 2
           });
-          m.addTo(vervolgLayer).bindPopup('<b>Verdiepingspunt #1</b><br>Score: 1.00<br>Hotspot: 11 waarnemingen nabij<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.266976,6.030654&travelmode=walking\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 12px;background:#f1c40f;color:#333;border-radius:10px;text-decoration:none;font-weight:600\'>Navigeer &#10148;</a>');
+          m.addTo(vervolgLayer).bindPopup('<b>Verdiepingspunt #1</b><br>Score: 1.00<br>Hotspot: 11 waarnemingen nabij<br><div style=\'display:flex;gap:6px;margin-top:8px\'><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.266976,6.030654&travelmode=walking\' target=\'_blank\' style=\'flex:1;display:inline-block;padding:8px 12px;background:#f1c40f;color:#333;border-radius:10px;text-decoration:none;text-align:center;font-weight:600;font-size:13px\'>Navigeer &#10148;</a><button onclick=\'voorspellingBezocht(51.266976,6.030654)\' style=\'flex:1;padding:8px 12px;background:#3498db;color:white;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-weight:600\'>Bezocht &#9998;</button></div>');
         })();
         
         (function() {
@@ -2103,7 +2103,7 @@ var BEKENDE_BURCHTEN = [[51.2498819, 6.022837], [51.255114, 6.02762], [51.256943
               radius: 5, color: '#f39c12', fillColor: '#f1c40f',
               fillOpacity: 0.85, weight: 2
           });
-          m.addTo(vervolgLayer).bindPopup('<b>Verdiepingspunt #2</b><br>Score: 1.00<br>Hotspot: 11 waarnemingen nabij<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.267201,6.030295&travelmode=walking\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 12px;background:#f1c40f;color:#333;border-radius:10px;text-decoration:none;font-weight:600\'>Navigeer &#10148;</a>');
+          m.addTo(vervolgLayer).bindPopup('<b>Verdiepingspunt #2</b><br>Score: 1.00<br>Hotspot: 11 waarnemingen nabij<br><div style=\'display:flex;gap:6px;margin-top:8px\'><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.267201,6.030295&travelmode=walking\' target=\'_blank\' style=\'flex:1;display:inline-block;padding:8px 12px;background:#f1c40f;color:#333;border-radius:10px;text-decoration:none;text-align:center;font-weight:600;font-size:13px\'>Navigeer &#10148;</a><button onclick=\'voorspellingBezocht(51.267201,6.030295)\' style=\'flex:1;padding:8px 12px;background:#3498db;color:white;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-weight:600\'>Bezocht &#9998;</button></div>');
         })();
         
         (function() {
@@ -2111,7 +2111,7 @@ var BEKENDE_BURCHTEN = [[51.2498819, 6.022837], [51.255114, 6.02762], [51.256943
               radius: 5, color: '#f39c12', fillColor: '#f1c40f',
               fillOpacity: 0.85, weight: 2
           });
-          m.addTo(vervolgLayer).bindPopup('<b>Verdiepingspunt #3</b><br>Score: 1.00<br>Hotspot: 11 waarnemingen nabij<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.267201,6.030654&travelmode=walking\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 12px;background:#f1c40f;color:#333;border-radius:10px;text-decoration:none;font-weight:600\'>Navigeer &#10148;</a>');
+          m.addTo(vervolgLayer).bindPopup('<b>Verdiepingspunt #3</b><br>Score: 1.00<br>Hotspot: 11 waarnemingen nabij<br><div style=\'display:flex;gap:6px;margin-top:8px\'><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.267201,6.030654&travelmode=walking\' target=\'_blank\' style=\'flex:1;display:inline-block;padding:8px 12px;background:#f1c40f;color:#333;border-radius:10px;text-decoration:none;text-align:center;font-weight:600;font-size:13px\'>Navigeer &#10148;</a><button onclick=\'voorspellingBezocht(51.267201,6.030654)\' style=\'flex:1;padding:8px 12px;background:#3498db;color:white;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-weight:600\'>Bezocht &#9998;</button></div>');
         })();
         
         (function() {
@@ -2119,7 +2119,7 @@ var BEKENDE_BURCHTEN = [[51.2498819, 6.022837], [51.255114, 6.02762], [51.256943
               radius: 5, color: '#f39c12', fillColor: '#f1c40f',
               fillOpacity: 0.85, weight: 2
           });
-          m.addTo(vervolgLayer).bindPopup('<b>Verdiepingspunt #4</b><br>Score: 1.00<br>Hotspot: 11 waarnemingen nabij<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.267201,6.031013&travelmode=walking\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 12px;background:#f1c40f;color:#333;border-radius:10px;text-decoration:none;font-weight:600\'>Navigeer &#10148;</a>');
+          m.addTo(vervolgLayer).bindPopup('<b>Verdiepingspunt #4</b><br>Score: 1.00<br>Hotspot: 11 waarnemingen nabij<br><div style=\'display:flex;gap:6px;margin-top:8px\'><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.267201,6.031013&travelmode=walking\' target=\'_blank\' style=\'flex:1;display:inline-block;padding:8px 12px;background:#f1c40f;color:#333;border-radius:10px;text-decoration:none;text-align:center;font-weight:600;font-size:13px\'>Navigeer &#10148;</a><button onclick=\'voorspellingBezocht(51.267201,6.031013)\' style=\'flex:1;padding:8px 12px;background:#3498db;color:white;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-weight:600\'>Bezocht &#9998;</button></div>');
         })();
         
         (function() {
@@ -2127,7 +2127,7 @@ var BEKENDE_BURCHTEN = [[51.2498819, 6.022837], [51.255114, 6.02762], [51.256943
               radius: 5, color: '#f39c12', fillColor: '#f1c40f',
               fillOpacity: 0.85, weight: 2
           });
-          m.addTo(vervolgLayer).bindPopup('<b>Verdiepingspunt #5</b><br>Score: 1.00<br>Hotspot: 11 waarnemingen nabij<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.267201,6.031731&travelmode=walking\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 12px;background:#f1c40f;color:#333;border-radius:10px;text-decoration:none;font-weight:600\'>Navigeer &#10148;</a>');
+          m.addTo(vervolgLayer).bindPopup('<b>Verdiepingspunt #5</b><br>Score: 1.00<br>Hotspot: 11 waarnemingen nabij<br><div style=\'display:flex;gap:6px;margin-top:8px\'><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.267201,6.031731&travelmode=walking\' target=\'_blank\' style=\'flex:1;display:inline-block;padding:8px 12px;background:#f1c40f;color:#333;border-radius:10px;text-decoration:none;text-align:center;font-weight:600;font-size:13px\'>Navigeer &#10148;</a><button onclick=\'voorspellingBezocht(51.267201,6.031731)\' style=\'flex:1;padding:8px 12px;background:#3498db;color:white;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-weight:600\'>Bezocht &#9998;</button></div>');
         })();
         
         (function() {
@@ -2135,7 +2135,7 @@ var BEKENDE_BURCHTEN = [[51.2498819, 6.022837], [51.255114, 6.02762], [51.256943
               radius: 5, color: '#f39c12', fillColor: '#f1c40f',
               fillOpacity: 0.85, weight: 2
           });
-          m.addTo(vervolgLayer).bindPopup('<b>Verdiepingspunt #6</b><br>Score: 1.00<br>Hotspot: 11 waarnemingen nabij<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.267426,6.030295&travelmode=walking\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 12px;background:#f1c40f;color:#333;border-radius:10px;text-decoration:none;font-weight:600\'>Navigeer &#10148;</a>');
+          m.addTo(vervolgLayer).bindPopup('<b>Verdiepingspunt #6</b><br>Score: 1.00<br>Hotspot: 11 waarnemingen nabij<br><div style=\'display:flex;gap:6px;margin-top:8px\'><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.267426,6.030295&travelmode=walking\' target=\'_blank\' style=\'flex:1;display:inline-block;padding:8px 12px;background:#f1c40f;color:#333;border-radius:10px;text-decoration:none;text-align:center;font-weight:600;font-size:13px\'>Navigeer &#10148;</a><button onclick=\'voorspellingBezocht(51.267426,6.030295)\' style=\'flex:1;padding:8px 12px;background:#3498db;color:white;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-weight:600\'>Bezocht &#9998;</button></div>');
         })();
         
         (function() {
@@ -2143,7 +2143,7 @@ var BEKENDE_BURCHTEN = [[51.2498819, 6.022837], [51.255114, 6.02762], [51.256943
               radius: 5, color: '#f39c12', fillColor: '#f1c40f',
               fillOpacity: 0.85, weight: 2
           });
-          m.addTo(vervolgLayer).bindPopup('<b>Verdiepingspunt #7</b><br>Score: 1.00<br>Hotspot: 11 waarnemingen nabij<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.267426,6.030654&travelmode=walking\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 12px;background:#f1c40f;color:#333;border-radius:10px;text-decoration:none;font-weight:600\'>Navigeer &#10148;</a>');
+          m.addTo(vervolgLayer).bindPopup('<b>Verdiepingspunt #7</b><br>Score: 1.00<br>Hotspot: 11 waarnemingen nabij<br><div style=\'display:flex;gap:6px;margin-top:8px\'><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.267426,6.030654&travelmode=walking\' target=\'_blank\' style=\'flex:1;display:inline-block;padding:8px 12px;background:#f1c40f;color:#333;border-radius:10px;text-decoration:none;text-align:center;font-weight:600;font-size:13px\'>Navigeer &#10148;</a><button onclick=\'voorspellingBezocht(51.267426,6.030654)\' style=\'flex:1;padding:8px 12px;background:#3498db;color:white;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-weight:600\'>Bezocht &#9998;</button></div>');
         })();
         
         (function() {
@@ -2151,7 +2151,7 @@ var BEKENDE_BURCHTEN = [[51.2498819, 6.022837], [51.255114, 6.02762], [51.256943
               radius: 5, color: '#f39c12', fillColor: '#f1c40f',
               fillOpacity: 0.85, weight: 2
           });
-          m.addTo(vervolgLayer).bindPopup('<b>Verdiepingspunt #8</b><br>Score: 1.00<br>Hotspot: 11 waarnemingen nabij<br><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.267426,6.031013&travelmode=walking\' target=\'_blank\' style=\'display:inline-block;margin-top:6px;padding:8px 12px;background:#f1c40f;color:#333;border-radius:10px;text-decoration:none;font-weight:600\'>Navigeer &#10148;</a>');
+          m.addTo(vervolgLayer).bindPopup('<b>Verdiepingspunt #8</b><br>Score: 1.00<br>Hotspot: 11 waarnemingen nabij<br><div style=\'display:flex;gap:6px;margin-top:8px\'><a href=\'https://www.google.com/maps/dir/?api=1&destination=51.267426,6.031013&travelmode=walking\' target=\'_blank\' style=\'flex:1;display:inline-block;padding:8px 12px;background:#f1c40f;color:#333;border-radius:10px;text-decoration:none;text-align:center;font-weight:600;font-size:13px\'>Navigeer &#10148;</a><button onclick=\'voorspellingBezocht(51.267426,6.031013)\' style=\'flex:1;padding:8px 12px;background:#3498db;color:white;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-weight:600\'>Bezocht &#9998;</button></div>');
         })();
         
 
@@ -2589,7 +2589,7 @@ var feedbackMarkers = L.layerGroup().addTo(map);
 // In-memory opslag — werkt ook als localStorage niet beschikbaar is (file:// URLs)
 var _memFeedback = [];
 var _memFotos = [];
-var PREDICT_VERSIE = '2.0.1';
+var PREDICT_VERSIE = '2.0.2';
 
 function _slaOp(key, data) {
   var json = JSON.stringify(data);
@@ -2991,11 +2991,11 @@ function voorspellingBezocht(lat, lon) {
   document.getElementById('fbPanel').classList.add('open');
 }
 
-function toonToast(tekst) {
+function toonToast(tekst, duur) {
   var toast = document.getElementById('fbToast');
   toast.textContent = tekst;
   toast.classList.add('show');
-  setTimeout(function() { toast.classList.remove('show'); }, 3000);
+  setTimeout(function() { toast.classList.remove('show'); }, duur || 3000);
 }
 
 var gekozenType = null;
@@ -3407,7 +3407,16 @@ function verwijderTerritoriumMarkers(lat, lon, radius) {
 
 // === Export-systeem ===
 function getFeedbackData() {
-  return _memFeedback.slice();
+  // Primair: in-memory array
+  if (_memFeedback.length > 0) return _memFeedback.slice();
+  // Fallback: direct uit localStorage/sessionStorage lezen
+  var fallback = _laadOp('predict_feedback');
+  if (fallback.length > 0) {
+    console.warn('[Export] _memFeedback was leeg, hersteld uit opslag: ' + fallback.length);
+    _memFeedback = fallback;
+    return _memFeedback.slice();
+  }
+  return [];
 }
 
 function maakExportTekst() {
@@ -3475,7 +3484,13 @@ function openExport() {
   var el = document.getElementById('exSamenvatting');
 
   if (data.length === 0 && fotos.length === 0) {
-    el.innerHTML = '<p style="color:#999">Nog geen waarnemingen opgeslagen.<br>Gebruik de <b>+</b> knop voor waarnemingen.</p>';
+    var nVeld = 0;
+    try { nVeld = veldLayer.getLayers().length; } catch(e) {}
+    var uitleg = '';
+    if (nVeld > 0) {
+      uitleg = '<p style="color:#e67e22;font-weight:bold;margin-bottom:8px">De ' + nVeld + ' veldwaarnemingen op de kaart staan al op de PC.</p>';
+    }
+    el.innerHTML = uitleg + '<p style="color:#999">Geen nieuwe waarnemingen op deze telefoon.<br>Gebruik de <b style="font-size:18px">+</b> knop om waarnemingen toe te voegen.</p>';
   } else {
     var exHtmlLabels = {
       burcht: '&#9989; Burcht', wissel: '&#128062; Wissel', graafspoor: '&#9935; Graafspoor',
@@ -3577,14 +3592,14 @@ function _toonJsonVenster(json) {
 
 function exportWhatsApp() {
   var tekst = maakExportTekst();
-  if (!tekst) { toonToast('Geen waarnemingen'); return; }
+  if (!tekst) { toonToast('Markers op kaart staan al op PC. Voeg nieuwe toe via + knop.', 4000); return; }
   sluitExport();
   window.open('https://wa.me/?text=' + encodeURIComponent(tekst), '_blank');
 }
 
 function exportEmail() {
   var tekst = maakExportTekst();
-  if (!tekst) { toonToast('Geen waarnemingen'); return; }
+  if (!tekst) { toonToast('Markers op kaart staan al op PC. Voeg nieuwe toe via + knop.', 4000); return; }
   sluitExport();
   var subject = 'Predict veldwaarnemingen ' + new Date().toLocaleDateString('nl-NL');
   window.location.href = 'mailto:?subject=' + encodeURIComponent(subject) +
@@ -3593,7 +3608,7 @@ function exportEmail() {
 
 function exportKopieer() {
   var tekst = maakExportTekst();
-  if (!tekst) { toonToast('Geen waarnemingen'); return; }
+  if (!tekst) { toonToast('Markers op kaart staan al op PC. Voeg nieuwe toe via + knop.', 4000); return; }
 
   if (navigator.clipboard) {
     navigator.clipboard.writeText(tekst).then(function() {
@@ -3658,7 +3673,13 @@ function syncNaarPC() {
   fotos = _memFotos.slice();
 
   if (fb.length === 0 && fotos.length === 0) {
-    toonToast('Geen data om te synchroniseren');
+    var nOpKaart = 0;
+    try { nOpKaart = veldLayer.getLayers().length; } catch(e) {}
+    if (nOpKaart > 0) {
+      toonToast('Alle ' + nOpKaart + ' waarnemingen staan al op de PC. Voeg nieuwe toe via + knop.', 5000);
+    } else {
+      toonToast('Geen nieuwe waarnemingen. Voeg toe via + knop.');
+    }
     return;
   }
 
