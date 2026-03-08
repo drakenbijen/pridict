@@ -465,13 +465,19 @@ window.onerror = function(msg, url, line) {
     <span class="ea-icon">&#128203;</span>
     <div>Kopieer naar klembord<br><small style="color:#888">Plak daarna waar je wilt</small></div>
   </div>
-  <div class="export-actie" onclick="cloudSync()" style="border-color:#2980b9;background:#eef6ff">
-    <span class="ea-icon">&#9729;</span>
-    <div><b>Cloud Sync</b><br><small style="color:#888" id="cloudSyncLabel">Sync via GitHub (aanbevolen)</small></div>
+  <div style="border:2px solid #2980b9;border-radius:10px;padding:10px;margin:6px 0;background:#eef6ff">
+    <div style="font-weight:bold;margin-bottom:6px">&#9729; Cloud Sync</div>
+    <div style="display:flex;gap:6px;margin-bottom:6px">
+      <input type="text" id="ghTokenInput" placeholder="Plak GitHub token hier (ghp_...)"
+        style="flex:1;padding:8px;border:1px solid #ccc;border-radius:6px;font-size:14px"
+        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      <button onclick="cloudSyncGo()" style="padding:8px 14px;background:#2980b9;color:white;border:none;border-radius:6px;font-weight:bold;font-size:14px;white-space:nowrap">Sync</button>
+    </div>
+    <small style="color:#888" id="cloudSyncLabel">Plak je token en klik Sync</small>
   </div>
-  <div class="export-actie" onclick="cloudInstellen()" style="border-color:#95a5a6;padding:8px 12px">
-    <span class="ea-icon" style="font-size:16px">&#9881;</span>
-    <div style="font-size:13px">Cloud sync instellen<br><small style="color:#888">GitHub token invoeren/wijzigen</small></div>
+  <div class="export-actie" onclick="downloadBestand()" style="border-color:#27ae60;background:#eafaf1">
+    <span class="ea-icon">&#128229;</span>
+    <div><b>Download bestand</b><br><small style="color:#888">Sla op en deel via AirDrop/Mail/etc</small></div>
   </div>
   <div class="export-actie" onclick="kopieerJSON()" style="border-color:#8e44ad;padding:8px 12px">
     <span class="ea-icon" style="font-size:16px">&#128203;</span>
@@ -2589,7 +2595,7 @@ var feedbackMarkers = L.layerGroup().addTo(map);
 // In-memory opslag — werkt ook als localStorage niet beschikbaar is (file:// URLs)
 var _memFeedback = [];
 var _memFotos = [];
-var PREDICT_VERSIE = '2.0.3';
+var PREDICT_VERSIE = '2.1.1';
 
 function _slaOp(key, data) {
   var json = JSON.stringify(data);
@@ -3631,136 +3637,174 @@ function exportKopieer() {
   }
 }
 
-// === Sync IP beheer ===
 // === Cloud Sync (via GitHub Gist) ===
+// Token in geheugen (localStorage werkt niet op alle iPhones)
+var _ghToken = null;
+var _ghGistId = null;
+
+function _opslaan(k, v) {
+  try { localStorage.setItem(k, v); } catch(e) {}
+  try { sessionStorage.setItem(k, v); } catch(e) {}
+}
+function _ophalen(k) {
+  var v = null;
+  try { v = localStorage.getItem(k); } catch(e) {}
+  if (!v) try { v = sessionStorage.getItem(k); } catch(e) {}
+  return v;
+}
+
+// Laad eerder opgeslagen token
+(function() {
+  _ghToken = _ophalen('predict_gh_token');
+  _ghGistId = _ophalen('predict_gist_id');
+})();
+
 function updateCloudLabel() {
   var el = document.getElementById('cloudSyncLabel');
   if (!el) return;
-  var token = localStorage.getItem('predict_gh_token');
-  var gistId = localStorage.getItem('predict_gist_id');
-  if (!token) {
-    el.innerHTML = '<span style="color:#e74c3c">Token niet ingesteld</span>';
-  } else if (gistId) {
-    el.textContent = 'Klaar om te syncen';
+  var inp = document.getElementById('ghTokenInput');
+  if (_ghToken) {
+    if (inp) inp.value = _ghToken.substring(0, 8) + '...';
+    el.innerHTML = _ghGistId
+      ? '<span style="color:#27ae60">&#9989; Klaar om te syncen</span>'
+      : '<span style="color:#2980b9">Token OK — klik Sync</span>';
   } else {
-    el.textContent = 'Token OK, eerste sync maakt verbinding';
+    el.textContent = 'Plak je token en klik Sync';
   }
 }
 
 var _origOpenExport = openExport;
 openExport = function() { _origOpenExport(); updateCloudLabel(); };
 
-function cloudInstellen() {
-  var huidig = localStorage.getItem('predict_gh_token') || '';
-  var masked = huidig ? huidig.substring(0, 8) + '...' : '(niet ingesteld)';
-  var nieuw = prompt(
-    'Cloud Sync instellen\n\n' +
-    'Huidig token: ' + masked + '\n\n' +
-    'Voer je GitHub Personal Access Token in.\n' +
-    'Maak er een aan op:\n' +
-    'github.com > Settings > Developer settings >\n' +
-    'Personal access tokens > Tokens (classic)\n\n' +
-    'Selecteer alleen de \'gist\' scope.\n\n' +
-    'Leeg laten = verwijderen',
-    ''
-  );
-  if (nieuw === null) return;
-  if (nieuw.trim() === '') {
-    localStorage.removeItem('predict_gh_token');
-    localStorage.removeItem('predict_gist_id');
-    toonToast('Cloud sync token verwijderd');
-  } else {
-    localStorage.setItem('predict_gh_token', nieuw.trim());
-    toonToast('Token opgeslagen! Klik nu Cloud Sync om te testen.', 4000);
+function cloudSyncGo() {
+  // Lees token uit invoerveld
+  var inp = document.getElementById('ghTokenInput');
+  var tokenVal = (inp ? inp.value.trim() : '');
+
+  // Als invoerveld een echt token bevat (niet de gemaskeerde versie)
+  if (tokenVal && tokenVal.indexOf('...') < 0 && tokenVal.length > 10) {
+    _ghToken = tokenVal;
+    _opslaan('predict_gh_token', _ghToken);
   }
-  updateCloudLabel();
-}
 
-function cloudSync() {
-  sluitExport();
-
-  // Check token
-  var token = localStorage.getItem('predict_gh_token');
-  if (!token) {
-    toonToast('Stel eerst een GitHub token in via Cloud instellen.', 5000);
+  if (!_ghToken) {
+    toonToast('Plak je GitHub token in het veld hierboven.', 4000);
+    if (inp) inp.focus();
     return;
   }
 
-  // Verzamel data
-  var fb = getFeedbackData();
-  var fotos = _memFotos.slice();
+  sluitExport();
 
-  if (fb.length === 0 && fotos.length === 0) {
+  // Verzamel data (zonder foto's — te groot voor cloud)
+  var fbRaw = getFeedbackData();
+  if (fbRaw.length === 0) {
     toonToast('Geen waarnemingen om te syncen. Voeg toe via + knop.', 4000);
     return;
   }
+  var fb = fbRaw.map(function(item) {
+    var clean = {};
+    for (var k in item) {
+      if (k !== 'foto') clean[k] = item[k];
+    }
+    return clean;
+  });
 
-  toonToast('Uploaden naar cloud... (' + fb.length + ' waarnemingen)', 3000);
+  toonToast('Uploaden... (' + fb.length + ' waarnemingen)', 3000);
 
   var syncPayload = {
     feedback: fb,
-    fotos_count: fotos.length,
     timestamp: new Date().toISOString(),
     versie: PREDICT_VERSIE
   };
 
-  var gistId = localStorage.getItem('predict_gist_id');
-  var isUpdate = !!gistId;
+  var isUpdate = !!_ghGistId;
   var url = isUpdate
-    ? 'https://api.github.com/gists/' + gistId
+    ? 'https://api.github.com/gists/' + _ghGistId
     : 'https://api.github.com/gists';
-
-  var body = {
-    description: 'Predict velddata sync - ' + new Date().toLocaleDateString('nl-NL'),
-    public: false,
-    files: {
-      'predict_sync.json': {
-        content: JSON.stringify(syncPayload, null, 2)
-      }
-    }
-  };
 
   fetch(url, {
     method: isUpdate ? 'PATCH' : 'POST',
     headers: {
-      'Authorization': 'token ' + token,
+      'Authorization': 'token ' + _ghToken,
       'Content-Type': 'application/json',
       'Accept': 'application/vnd.github.v3+json'
     },
-    body: JSON.stringify(body)
+    body: JSON.stringify({
+      description: 'Predict velddata sync',
+      public: false,
+      files: { 'predict_sync.json': { content: JSON.stringify(syncPayload, null, 2) } }
+    })
   })
   .then(function(r) {
-    if (!r.ok) {
-      return r.json().then(function(err) {
-        throw new Error(err.message || 'HTTP ' + r.status);
-      });
-    }
+    if (!r.ok) throw new Error('HTTP ' + r.status);
     return r.json();
   })
   .then(function(gist) {
     if (gist.id) {
-      localStorage.setItem('predict_gist_id', gist.id);
+      _ghGistId = gist.id;
+      _opslaan('predict_gist_id', gist.id);
       toonToast('Sync gelukt! ' + fb.length + ' waarnemingen in de cloud.', 5000);
-      console.info('[Cloud Sync] Gist ID: ' + gist.id);
-      console.info('[Cloud Sync] URL: ' + gist.html_url);
-    } else {
-      toonToast('Onverwacht antwoord van GitHub.', 5000);
     }
   })
   .catch(function(err) {
-    console.error('[Cloud Sync] Fout:', err);
-    if (err.message && err.message.indexOf('401') >= 0) {
-      toonToast('Token ongeldig of verlopen. Stel opnieuw in.', 5000);
-      localStorage.removeItem('predict_gh_token');
-    } else if (err.message && err.message.indexOf('404') >= 0) {
-      // Gist verwijderd — maak nieuwe aan
-      localStorage.removeItem('predict_gist_id');
-      toonToast('Gist niet gevonden, probeer opnieuw...', 3000);
-      setTimeout(cloudSync, 500);
+    console.error('[Cloud Sync]', err);
+    if (err.message.indexOf('401') >= 0) {
+      toonToast('Token ongeldig. Controleer en probeer opnieuw.', 5000);
+      _ghToken = null;
+    } else if (err.message.indexOf('404') >= 0) {
+      _ghGistId = null;
+      toonToast('Opnieuw verbinden...', 2000);
+      setTimeout(cloudSyncGo, 500);
     } else {
-      toonToast('Sync fout: ' + err.message, 5000);
+      toonToast('Fout: ' + err.message, 5000);
     }
   });
+}
+
+// === Download als bestand (werkt altijd) ===
+function downloadBestand() {
+  var fb = getFeedbackData();
+  if (fb.length === 0) {
+    toonToast('Geen waarnemingen. Voeg toe via + knop.', 4000);
+    return;
+  }
+  var data = JSON.stringify({
+    feedback: fb,
+    timestamp: new Date().toISOString(),
+    versie: PREDICT_VERSIE
+  }, null, 2);
+
+  var blob = new Blob([data], { type: 'application/json' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'predict_velddata_' + new Date().toISOString().slice(0,10) + '.json';
+
+  // Probeer native share als beschikbaar (iOS deelmenu)
+  if (navigator.share && navigator.canShare) {
+    var file = new File([data], a.download, { type: 'application/json' });
+    if (navigator.canShare({ files: [file] })) {
+      navigator.share({
+        title: 'Predict velddata',
+        files: [file]
+      }).then(function() {
+        toonToast('Bestand gedeeld!', 3000);
+      }).catch(function() {
+        // Fallback: gewone download
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        toonToast('Bestand gedownload. Stuur het naar je PC.', 5000);
+      });
+      URL.revokeObjectURL(url);
+      sluitExport();
+      return;
+    }
+  }
+
+  // Fallback: gewone download
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  sluitExport();
+  toonToast('Bestand gedownload (' + fb.length + ' waarnemingen). Stuur naar je PC.', 5000);
 }
 
 // === Foto-systeem ===
