@@ -2847,7 +2847,7 @@ function startGPS() {
                           p.coords.accuracy, '\u00b1' + p.coords.accuracy.toFixed(0) + 'm GPS');
         },
         function() {},
-        { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
+        { enableHighAccuracy: true, maximumAge: 15000, timeout: 20000 }
       );
     },
     function(err) {
@@ -3009,7 +3009,12 @@ function startKompas() {
   kompasActief = true;
   document.getElementById('btnKompas').style.background = '#e74c3c';
   document.getElementById('kompasIndicator').classList.add('active');
+  var _kompasLaatste = 0;
   kompasOrientationHandler = function(event) {
+    // Throttle: max 4x per seconde (batterijbesparing)
+    var nu = Date.now();
+    if (nu - _kompasLaatste < 250) return;
+    _kompasLaatste = nu;
     var heading = null;
     if (event.webkitCompassHeading !== undefined) {
       heading = event.webkitCompassHeading;
