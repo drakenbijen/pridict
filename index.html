@@ -3058,6 +3058,42 @@ function stopKompas() {
 
 checkKompasBeschikbaar();
 
+// === Batterijbesparing: GPS + kompas pauzeren als app op achtergrond ===
+var _gpsWasActief = false;
+var _kompasWasActief = false;
+document.addEventListener('visibilitychange', function() {
+  if (document.hidden) {
+    // App naar achtergrond — pauzeer alles
+    _gpsWasActief = gpsActief;
+    _kompasWasActief = kompasActief;
+    if (watchId !== null) {
+      navigator.geolocation.clearWatch(watchId);
+      watchId = null;
+    }
+    if (kompasActief) {
+      // Kompas event listener verwijderen (geen stopKompas — UI behouden)
+      if (kompasOrientationHandler) {
+        window.removeEventListener('deviceorientation', kompasOrientationHandler, true);
+      }
+    }
+  } else {
+    // App terug op voorgrond — hervat wat actief was
+    if (_gpsWasActief && gpsActief) {
+      watchId = navigator.geolocation.watchPosition(
+        function(p) {
+          setUserPosition(p.coords.latitude, p.coords.longitude,
+                          p.coords.accuracy, '\u00b1' + p.coords.accuracy.toFixed(0) + 'm GPS');
+        },
+        function() {},
+        { enableHighAccuracy: true, maximumAge: 15000, timeout: 20000 }
+      );
+    }
+    if (_kompasWasActief && kompasActief && kompasOrientationHandler) {
+      window.addEventListener('deviceorientation', kompasOrientationHandler, true);
+    }
+  }
+});
+
 function centerOpGebruiker() {
   if (userLat !== null) {
     volgGebruiker = true;
