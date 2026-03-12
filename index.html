@@ -40,6 +40,7 @@
   }
   .btn-gps { background: #2563eb; color: white; }
   .btn-gps.tracking { background: #2ecc71; animation: pulse 2s infinite; }
+  .btn-gps.navigatie { background: #e74c3c; animation: pulse 1.5s infinite; }
   .btn-info { background: white; color: #2c3e50; }
   .btn-feedback { background: #e67e22; color: white; font-size: 16px; }
   .btn-navigeer { background: #28a745; color: white; }
@@ -316,6 +317,13 @@ window.onerror = function(msg, url, line) {
   <div class="legenda-item"><div class="legenda-kleur" style="background:#ff6b6b;border-color:#e74c3c;border-radius:50%"></div>Validatieroute (10)</div><div style="font-size:10px;color:#888;margin-left:20px;margin-bottom:4px">Hoog scorende onbezochte locaties — bezoek en registreer als ‘leeg’ of vondst om het model te verbeteren</div>
   <div class="stats">
     Locaties: 100 | Raster: 75m
+  </div>
+  <hr style="margin:6px 0;border-color:#ddd">
+  <div style="font-weight:600;font-size:12px;margin-bottom:4px">GPS-knop (rechtsonder)</div>
+  <div style="font-size:10px;color:#888;line-height:1.5">
+    <b style="color:#2ecc71">&#9679; 1&times; tik</b> &mdash; Kaart volgt je positie<br>
+    <b style="color:#e74c3c">&#9679; 2&times; tik</b> &mdash; Navigatiemodus (positie + kompas)<br>
+    <b style="color:#2563eb">&#9679; 3&times; tik</b> &mdash; Vrij bewegen (normaal)
   </div>
 </div>
 
@@ -2733,7 +2741,8 @@ var accuracyCircle = null;
 var userLat = null, userLon = null;
 var watchId = null;
 var dichtstbij = null;
-var volgGebruiker = false;
+var volgGebruiker = false;    // kaart centreert op GPS
+var navigatieModus = false;   // kaart centreert + kompas draait mee (navigatie)
 var gpsActief = false;
 var handmatigeModus = false;
 
@@ -2769,8 +2778,8 @@ function setUserPosition(lat, lon, acc, bron) {
     }
   }
 
-  if (volgGebruiker) {
-    map.setView([lat, lon]);
+  if (volgGebruiker || navigatieModus) {
+    map.setView([lat, lon], map.getZoom(), {animate: true, duration: 0.5});
   }
 
   updateDichtstbij();
@@ -2952,6 +2961,11 @@ function checkKompasBeschikbaar() {
 }
 
 function toggleKompas() {
+  // Check of kompas beschikbaar is (kan aangeroepen worden vanuit navigatiemodus)
+  if (typeof map.setBearing !== 'function') {
+    toonToast('Kompas niet beschikbaar op dit apparaat');
+    return;
+  }
   if (kompasActief) { stopKompas(); return; }
   if (typeof DeviceOrientationEvent !== 'undefined' &&
       typeof DeviceOrientationEvent.requestPermission === 'function' &&
@@ -2994,6 +3008,10 @@ function startKompas() {
       if (kompasHeading >= 360) kompasHeading -= 360;
       // Roteer kaart via leaflet-rotate (alleen tiles/markers draaien, UI blijft recht)
       map.setBearing(kompasHeading);
+      // In navigatiemodus: centreer continu op gebruiker
+      if (navigatieModus && userLat !== null) {
+        map.setView([userLat, userLon], map.getZoom(), {animate: false});
+      }
       // Kompas-indicator draait mee (noord-pijl wijst naar noorden)
       var svg = document.querySelector('#kompasIndicator svg');
       if (svg) svg.style.transform = 'rotate(' + kompasHeading + 'deg)';
@@ -3005,6 +3023,12 @@ function startKompas() {
 
 function stopKompas() {
   kompasActief = false;
+  // Als navigatiemodus actief was, schakel ook die uit
+  if (navigatieModus) {
+    navigatieModus = false;
+    volgGebruiker = false;
+    _updateGpsKnop();
+  }
   document.getElementById('btnKompas').style.background = '#34495e';
   document.getElementById('kompasIndicator').classList.remove('active');
   if (kompasOrientationHandler) {
@@ -3058,19 +3082,65 @@ document.addEventListener('visibilitychange', function() {
   }
 });
 
+// GPS-knop: 3 standen toggle
+// 1. Normaal (blauw) → tik → Volgen (groen): centreert op GPS
+// 2. Volgen (groen)   → tik → Navigatie (rood): centreert + kompas + zoom 17
+// 3. Navigatie (rood) → tik → Normaal: stop volgen + stop kompas
 function centerOpGebruiker() {
-  if (userLat !== null) {
-    volgGebruiker = true;
-    map.setView([userLat, userLon], 17);
-  } else if (!gpsActief) {
+  if (userLat === null && !gpsActief) {
     activeerHandmatig();
-  } else {
+    return;
+  }
+  if (userLat === null) {
     startGPS();
+    return;
+  }
+
+  if (navigatieModus) {
+    // Stand 3→1: navigatie uit → normaal
+    navigatieModus = false;
+    volgGebruiker = false;
+    stopKompas();
+    _updateGpsKnop();
+    toonToast('Navigatie uit');
+  } else if (volgGebruiker) {
+    // Stand 2→3: volgen → navigatie (met kompas)
+    navigatieModus = true;
+    map.setView([userLat, userLon], 17, {animate: true});
+    if (!kompasActief) toggleKompas();
+    _updateGpsKnop();
+    toonToast('Navigatiemodus — kaart volgt je positie en richting');
+  } else {
+    // Stand 1→2: normaal → volgen
+    volgGebruiker = true;
+    map.setView([userLat, userLon], 17, {animate: true});
+    _updateGpsKnop();
+    toonToast('Kaart volgt je positie');
   }
 }
 
-// Stop volgen als gebruiker zelf pant
-map.on('movestart', function() { volgGebruiker = false; });
+function _updateGpsKnop() {
+  var btn = document.getElementById('btnGps');
+  if (navigatieModus) {
+    btn.className = 'veld-btn btn-gps navigatie';
+    btn.innerHTML = '&#9992;';  // vliegtuig-icoon = navigatiemodus
+  } else if (volgGebruiker) {
+    btn.className = 'veld-btn btn-gps tracking';
+    btn.innerHTML = '&#9737;';
+  } else {
+    btn.className = 'veld-btn btn-gps' + (gpsActief ? ' tracking' : '');
+    btn.innerHTML = '&#9737;';
+  }
+}
+
+// Stop volgen als gebruiker handmatig pant (maar niet in navigatiemodus)
+var _userIsInteracting = false;
+map.on('movestart', function() {
+  // In navigatiemodus: negeer programmatische pans
+  if (navigatieModus) return;
+  volgGebruiker = false;
+  _updateGpsKnop();
+});
 
 // === Dradenkruis: toon coördinaten van kaartcentrum ===
 function updateNavBar() {
