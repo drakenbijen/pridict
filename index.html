@@ -2979,6 +2979,7 @@ function startKompas() {
   document.getElementById('btnKompas').style.background = '#e74c3c';
   document.getElementById('kompasIndicator').classList.add('active');
   var _kompasLaatste = 0;
+  var _gebruiktAbsoluut = false;
   kompasOrientationHandler = function(event) {
     // Throttle: max 4x per seconde (batterijbesparing)
     var nu = Date.now();
@@ -2986,9 +2987,14 @@ function startKompas() {
     _kompasLaatste = nu;
     var heading = null;
     if (event.webkitCompassHeading !== undefined) {
+      // iOS: webkitCompassHeading = echte kompasrichting (0=N, 90=O)
       heading = event.webkitCompassHeading;
-    } else if (event.alpha !== null) {
-      heading = 360 - event.alpha;
+    } else if (event.absolute === true && event.alpha !== null) {
+      // Android absolute event: alpha is relatief t.o.v. magnetisch noorden
+      heading = (360 - event.alpha) % 360;
+    } else if (event.alpha !== null && _gebruiktAbsoluut === false) {
+      // Android fallback: niet-absolute alpha (kan onbetrouwbaar zijn)
+      heading = (360 - event.alpha) % 360;
     }
     if (heading !== null && !isNaN(heading)) {
       // Bewaar ruwe heading (voor richtingvastlegging bij wissels)
@@ -3011,7 +3017,13 @@ function startKompas() {
       if (svg) svg.style.transform = 'rotate(' + kompasHeading + 'deg)';
     }
   };
-  window.addEventListener('deviceorientation', kompasOrientationHandler, true);
+  // Android: probeer eerst deviceorientationabsolute (gegarandeerd kompas-noorden)
+  if ('ondeviceorientationabsolute' in window) {
+    window.addEventListener('deviceorientationabsolute', kompasOrientationHandler, true);
+    _gebruiktAbsoluut = true;
+  } else {
+    window.addEventListener('deviceorientation', kompasOrientationHandler, true);
+  }
   toonToast('Kompas aan — kaart volgt richting');
 }
 
@@ -3027,6 +3039,7 @@ function stopKompas() {
   document.getElementById('kompasIndicator').classList.remove('active');
   if (kompasOrientationHandler) {
     window.removeEventListener('deviceorientation', kompasOrientationHandler, true);
+    window.removeEventListener('deviceorientationabsolute', kompasOrientationHandler, true);
     kompasOrientationHandler = null;
   }
   // Reset kaart naar noord-omhoog
@@ -3056,6 +3069,7 @@ document.addEventListener('visibilitychange', function() {
       // Kompas event listener verwijderen (geen stopKompas — UI behouden)
       if (kompasOrientationHandler) {
         window.removeEventListener('deviceorientation', kompasOrientationHandler, true);
+        window.removeEventListener('deviceorientationabsolute', kompasOrientationHandler, true);
       }
     }
   } else {
@@ -3071,7 +3085,11 @@ document.addEventListener('visibilitychange', function() {
       );
     }
     if (_kompasWasActief && kompasActief && kompasOrientationHandler) {
-      window.addEventListener('deviceorientation', kompasOrientationHandler, true);
+      if ('ondeviceorientationabsolute' in window) {
+        window.addEventListener('deviceorientationabsolute', kompasOrientationHandler, true);
+      } else {
+        window.addEventListener('deviceorientation', kompasOrientationHandler, true);
+      }
     }
   }
 });
