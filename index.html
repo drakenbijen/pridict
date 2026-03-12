@@ -504,15 +504,9 @@ window.onerror = function(msg, url, line) {
     <span class="ea-icon">&#128203;</span>
     <div>Kopieer naar klembord<br><small style="color:#888">Plak daarna waar je wilt</small></div>
   </div>
-  <div style="border:2px solid #2980b9;border-radius:10px;padding:10px;margin:6px 0;background:#eef6ff">
-    <div style="font-weight:bold;margin-bottom:6px">&#9729; Cloud Sync</div>
-    <div style="display:flex;gap:6px;margin-bottom:6px">
-      <input type="text" id="ghTokenInput" placeholder="Plak GitHub token hier (ghp_...)"
-        style="flex:1;padding:8px;border:1px solid #ccc;border-radius:6px;font-size:14px"
-        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-      <button onclick="cloudSyncGo()" style="padding:8px 14px;background:#2980b9;color:white;border:none;border-radius:6px;font-weight:bold;font-size:14px;white-space:nowrap">Sync</button>
-    </div>
-    <small style="color:#888" id="cloudSyncLabel">Plak je token en klik Sync</small>
+  <div class="export-actie" onclick="cloudSyncGo()" style="border-color:#2980b9;background:#eef6ff">
+    <span class="ea-icon">&#9729;</span>
+    <div><b>Sync naar PC</b><br><small style="color:#888" id="cloudSyncLabel">Klik om waarnemingen te versturen</small></div>
   </div>
   <div class="export-actie" onclick="downloadBestand()" style="border-color:#27ae60;background:#eafaf1">
     <span class="ea-icon">&#128229;</span>
@@ -4297,10 +4291,9 @@ function exportKopieer() {
   }
 }
 
-// === Cloud Sync (via GitHub Gist) ===
-// Token in geheugen (localStorage werkt niet op alle iPhones)
-var _ghToken = null;
-var _ghGistId = null;
+// === Cloud Sync (via jsonblob.com — geen token nodig) ===
+// Sync-blob ID is ingebakken in de kaart door de PC
+var SYNC_BLOB_ID = '019ce3c4-c1af-7896-a95e-868313ca62ae';
 
 function _opslaan(k, v) {
   try { localStorage.setItem(k, v); } catch(e) {}
@@ -4313,43 +4306,9 @@ function _ophalen(k) {
   return v;
 }
 
-// Laad eerder opgeslagen token
-(function() {
-  _ghToken = _ophalen('predict_gh_token');
-  _ghGistId = _ophalen('predict_gist_id');
-})();
-
-function updateCloudLabel() {
-  var el = document.getElementById('cloudSyncLabel');
-  if (!el) return;
-  var inp = document.getElementById('ghTokenInput');
-  if (_ghToken) {
-    if (inp) inp.value = _ghToken.substring(0, 8) + '...';
-    el.innerHTML = _ghGistId
-      ? '<span style="color:#27ae60">&#9989; Klaar om te syncen</span>'
-      : '<span style="color:#2980b9">Token OK — klik Sync</span>';
-  } else {
-    el.textContent = 'Plak je token en klik Sync';
-  }
-}
-
-var _origOpenExport = openExport;
-openExport = function() { _origOpenExport(); updateCloudLabel(); };
-
 function cloudSyncGo() {
-  // Lees token uit invoerveld
-  var inp = document.getElementById('ghTokenInput');
-  var tokenVal = (inp ? inp.value.trim() : '');
-
-  // Als invoerveld een echt token bevat (niet de gemaskeerde versie)
-  if (tokenVal && tokenVal.indexOf('...') < 0 && tokenVal.length > 10) {
-    _ghToken = tokenVal;
-    _opslaan('predict_gh_token', _ghToken);
-  }
-
-  if (!_ghToken) {
-    toonToast('Plak je GitHub token in het veld hierboven.', 4000);
-    if (inp) inp.focus();
+  if (!SYNC_BLOB_ID) {
+    toonToast('Sync niet beschikbaar. Genereer eerst een nieuwe kaart op de PC.', 5000);
     return;
   }
 
@@ -4377,47 +4336,24 @@ function cloudSyncGo() {
     versie: PREDICT_VERSIE
   };
 
-  var isUpdate = !!_ghGistId;
-  var url = isUpdate
-    ? 'https://api.github.com/gists/' + _ghGistId
-    : 'https://api.github.com/gists';
-
-  fetch(url, {
-    method: isUpdate ? 'PATCH' : 'POST',
+  fetch('https://jsonblob.com/api/jsonBlob/' + SYNC_BLOB_ID, {
+    method: 'PUT',
     headers: {
-      'Authorization': 'token ' + _ghToken,
       'Content-Type': 'application/json',
-      'Accept': 'application/vnd.github.v3+json'
+      'Accept': 'application/json'
     },
-    body: JSON.stringify({
-      description: 'Predict velddata sync',
-      public: false,
-      files: { 'predict_sync.json': { content: JSON.stringify(syncPayload, null, 2) } }
-    })
+    body: JSON.stringify(syncPayload)
   })
   .then(function(r) {
     if (!r.ok) throw new Error('HTTP ' + r.status);
-    return r.json();
-  })
-  .then(function(gist) {
-    if (gist.id) {
-      _ghGistId = gist.id;
-      _opslaan('predict_gist_id', gist.id);
-      toonToast('Sync gelukt! ' + fb.length + ' waarnemingen in de cloud.', 5000);
-    }
+    toonToast('Sync gelukt! ' + fb.length + ' waarnemingen verstuurd naar PC.', 5000);
+    var el = document.getElementById('cloudSyncLabel');
+    if (el) el.innerHTML = '<span style="color:#27ae60">&#9989; Gesynct om ' +
+      new Date().toLocaleTimeString('nl-NL', {hour:'2-digit',minute:'2-digit'}) + '</span>';
   })
   .catch(function(err) {
     console.error('[Cloud Sync]', err);
-    if (err.message.indexOf('401') >= 0) {
-      toonToast('Token ongeldig. Controleer en probeer opnieuw.', 5000);
-      _ghToken = null;
-    } else if (err.message.indexOf('404') >= 0) {
-      _ghGistId = null;
-      toonToast('Opnieuw verbinden...', 2000);
-      setTimeout(cloudSyncGo, 500);
-    } else {
-      toonToast('Fout: ' + err.message, 5000);
-    }
+    toonToast('Sync mislukt: ' + err.message + '. Probeer opnieuw.', 5000);
   });
 }
 
